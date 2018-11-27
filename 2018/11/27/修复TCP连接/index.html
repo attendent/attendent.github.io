@@ -75,7 +75,7 @@
 		<header class="article-info clearfix">
   <h1 itemprop="name">
     
-      <a href="/2018/11/27/TCP连接修复历程/" title="阿里云上Netty使用Tcp断开异常" itemprop="url">阿里云上Netty使用Tcp断开异常</a>
+      <a href="/2018/11/27/修复TCP连接/" title="阿里云上Netty使用Tcp断开异常" itemprop="url">阿里云上Netty使用Tcp断开异常</a>
   </h1>
   <p class="article-author">By
     
@@ -83,7 +83,7 @@
     </p>
   <p class="article-time">
     <time datetime="2018-11-27T00:55:29.000Z" itemprop="datePublished">2018-11-27</time>
-    Updated:<time datetime="2018-11-27T14:54:59.807Z" itemprop="dateModified">2018-11-27</time>
+    Updated:<time datetime="2018-11-27T15:15:10.051Z" itemprop="dateModified">2018-11-27</time>
     
   </p>
 </header>
@@ -98,16 +98,17 @@
 		<h1 id="Netty使用TCP连接错误"><a href="#Netty使用TCP连接错误" class="headerlink" title="Netty使用TCP连接错误"></a>Netty使用TCP连接错误</h1><h2 id="表面原因"><a href="#表面原因" class="headerlink" title="表面原因"></a>表面原因</h2><p>​    在与嵌入式组进行TCP连接时发生未知错误导致<strong>服务器接收不到数据</strong>。并且Netty封装的exceptionCaught方法以及channelInactive方法<strong>捕获不到任何的报错异常以及连接断开情况。</strong></p>
 <h2 id="探寻主线"><a href="#探寻主线" class="headerlink" title="探寻主线"></a>探寻主线</h2><p>​    一开始使用<code>tcpdump -iany tcp port 8090</code>对8090端口进行抓包，发现在经过三次握手之后服务器与客户端之间就开始了一来一往的包传递，在经过了几个小时之后，包之间的传递戛然而止，查看最后几个包的信息，并<strong>没有看到有关断开连接的四次握手操作</strong>。</p>
 <p>​    Linux操作环境中使用<code>lsof  -i:port</code>检测打开套接字的状态。发现除了一条用于监听8090端口连接的线程外，该端口还建立了多条处于<strong>ETABLISHED</strong>状态的线程。</p>
-<p><img src="TCP连接修复历程\多个ESTABLISHED状态.jpg" alt="多个ESTABLISHED状态"></p>
+<img src="/2018/11/27/修复TCP连接/多个ESTABLISHED状态.jpg" title="多个ESTABLISHED状态">
+<p><img src="/27/修复TCP连接/多个ESTABLISHED状态.jpg" alt="多个ESTABLISHED状态"></p>
 <p>​    由于客户端只有一个，在查阅了资料发现在一台客户端与服务器的TCP连接中，处于连接状态，即<strong>ETABLISHED</strong>状态的线程应该只有一条。</p>
 <p>​    于是尝试使用<code>kill -9 port</code>杀死了目前正在运行的Java项目，同时可以观测到除了监听线程被关闭外，其他8090端口的线程<strong>都处于FIN-WAIT-1状态</strong>，即正在等待客户端返回ACK与FIN。但很明显，客户端没能够返回该信号而导致该线程一直处于该状态。直到几分钟过去了，服务器强制关闭了这些线程。</p>
-<p><img src="TCP连接修复历程\多个FIN_WAIT1状态.jpg" alt="多个FIN_WAIT1状态"></p>
+<p><img src="/27/修复TCP连接/多个FIN_WAIT1状态.jpg" alt="多个FIN_WAIT1状态"></p>
 <p>​    此处查看了网络上的资料，发现当服务器出现很多ESTABLISHED状态时，可能是这时候若客户端断开的时候未发送FIN包，则服务端处还是显示ESTABLISHED状态；</p>
 <p>​    结果客户端重新连接服务器。而新连接上来的客户端（也就是刚才断掉的重新连上来了）在服务端肯定是ESTABLISHED; </p>
 <p>​    如果客户端重复的上演这种情况，那么服务端将会出现大量的假的ESTABLISHED连接和CLOSE_WAIT连接。最终结果就是新的其他客户端无法连接上来，但是利用netstat还是能看到一条连接已经建立，并显示ESTABLISHED，但始终无法进入程序代码。</p>
 <p>​    这时想起最初的时候嵌入式组为了防止服务器的断线，每隔几分钟便断开连接并重新连接。此时可能由于网络上的问题，导致断开的信息服务器未能接收到，这样就造成了上述的情况。在本地电脑跑的时候没有这么频繁的断开事故可能就是网络的原因。</p>
 <p>​    <strong>那么阿里云的网络有这么差么？</strong>经过下面测试。。emmm。。看来发送个几百条断开信号但因为网络原因漏掉几条也没什么不对的。。</p>
-<p><img src="TCP连接修复历程\ping超时.png" alt="ping超时"></p>
+<p><img src="/27/修复TCP连接/ping超时.png" alt="ping超时"></p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>​    使用正则表达式对嵌入式发送的数据进行匹配，若发现不符合数据格式则抛出异常并断开连接，防止影响后面的数据库操作。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\b\w*:V_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,I_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,P_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,PF_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,F_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,W_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*\bend</span><br></pre></td></tr></table></figure>
 <p>​    与嵌入式端协调，取消每隔几分钟断开重连的机制。</p>
@@ -126,7 +127,7 @@
 
 <div class="article-share" id="share">
 
-  <div data-url="attendent.github.io/2018/11/27/TCP连接修复历程/" data-title="阿里云上Netty使用Tcp断开异常 | HC、Bolg" data-tsina="" class="share clearfix">
+  <div data-url="attendent.github.io/2018/11/27/修复TCP连接/" data-title="阿里云上Netty使用Tcp断开异常 | HC、Bolg" data-tsina="" class="share clearfix">
   </div>
 
 </div>
@@ -135,14 +136,6 @@
 	
 <nav class="article-nav clearfix">
  
- <div class="prev">
- <a href="/2018/11/27/post-name/" title="post_name">
-  <strong>PREVIOUS:</strong><br>
-  <span>
-  post_name</span>
-</a>
-</div>
-
 
 <div class="next">
 <a href="/2018/10/25/Linux/" title="Linux">
@@ -157,7 +150,7 @@
 	
 <section class="comment">
 	
-	<div class="ds-thread" data-title="阿里云上Netty使用Tcp断开异常" data-thread-key="TCP连接修复历程" data-author-key="HC、" data-url="attendent.github.io/post/TCP连接修复历程"></div>
+	<div class="ds-thread" data-title="阿里云上Netty使用Tcp断开异常" data-thread-key="修复TCP连接" data-author-key="HC、" data-url="attendent.github.io/post/修复TCP连接"></div>
 	
 </section>
 
