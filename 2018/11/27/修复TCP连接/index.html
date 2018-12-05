@@ -8,20 +8,21 @@
   <link rel="dns-prefetch" href="attendent.github.io">
   <title>阿里云上Netty使用Tcp断开异常 | HC的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Netty使用TCP连接错误表面原因​    在与嵌入式组进行TCP连接时发生未知错误导致服务器接收不到数据。并且Netty封装的exceptionCaught方法以及channelInactive方法捕获不到任何的报错异常以及连接断开情况。 &amp;lt;!-#-more–&amp;gt; 探寻主线​    一开始使用tcpdump -iany tcp port 8090对8090端口进行抓包，发现在经过三次">
+  <meta name="description" content="Netty使用TCP连接错误表面原因​    在与嵌入式组进行TCP连接时发生未知错误导致服务器接收不到数据。并且Netty封装的exceptionCaught方法以及channelInactive方法捕获不到任何的报错异常以及连接断开情况。">
+<meta name="keywords" content="Netty">
 <meta property="og:type" content="article">
 <meta property="og:title" content="阿里云上Netty使用Tcp断开异常">
 <meta property="og:url" content="attendent.github.io/2018/11/27/修复TCP连接/index.html">
 <meta property="og:site_name" content="HC的博客">
-<meta property="og:description" content="Netty使用TCP连接错误表面原因​    在与嵌入式组进行TCP连接时发生未知错误导致服务器接收不到数据。并且Netty封装的exceptionCaught方法以及channelInactive方法捕获不到任何的报错异常以及连接断开情况。 &amp;lt;!-#-more–&amp;gt; 探寻主线​    一开始使用tcpdump -iany tcp port 8090对8090端口进行抓包，发现在经过三次">
+<meta property="og:description" content="Netty使用TCP连接错误表面原因​    在与嵌入式组进行TCP连接时发生未知错误导致服务器接收不到数据。并且Netty封装的exceptionCaught方法以及channelInactive方法捕获不到任何的报错异常以及连接断开情况。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="/2018/11/27/修复TCP连接/多个ESTABLISHED状态.jpg">
 <meta property="og:image" content="/2018/11/27/修复TCP连接/多个FIN_WAIT1状态.jpg">
 <meta property="og:image" content="/2018/11/27/修复TCP连接/ping超时.png">
-<meta property="og:updated_time" content="2018-12-05T07:28:35.539Z">
+<meta property="og:updated_time" content="2018-12-05T07:43:05.700Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="阿里云上Netty使用Tcp断开异常">
-<meta name="twitter:description" content="Netty使用TCP连接错误表面原因​    在与嵌入式组进行TCP连接时发生未知错误导致服务器接收不到数据。并且Netty封装的exceptionCaught方法以及channelInactive方法捕获不到任何的报错异常以及连接断开情况。 &amp;lt;!-#-more–&amp;gt; 探寻主线​    一开始使用tcpdump -iany tcp port 8090对8090端口进行抓包，发现在经过三次">
+<meta name="twitter:description" content="Netty使用TCP连接错误表面原因​    在与嵌入式组进行TCP连接时发生未知错误导致服务器接收不到数据。并且Netty封装的exceptionCaught方法以及channelInactive方法捕获不到任何的报错异常以及连接断开情况。">
 <meta name="twitter:image" content="/2018/11/27/修复TCP连接/多个ESTABLISHED状态.jpg">
   
     <link rel="alternative" href="/atom.xml" title="HC的博客" type="application/atom+xml">
@@ -191,7 +192,7 @@ var _hmt = _hmt || [];
     <div class="article-entry" itemprop="articleBody">
       
         <h1 id="Netty使用TCP连接错误"><a href="#Netty使用TCP连接错误" class="headerlink" title="Netty使用TCP连接错误"></a>Netty使用TCP连接错误</h1><h2 id="表面原因"><a href="#表面原因" class="headerlink" title="表面原因"></a>表面原因</h2><p>​    在与嵌入式组进行TCP连接时发生未知错误导致<strong>服务器接收不到数据</strong>。并且Netty封装的exceptionCaught方法以及channelInactive方法<strong>捕获不到任何的报错异常以及连接断开情况。</strong></p>
-<p>&lt;!-#-more–&gt;</p>
+<a id="more"></a>
 <h2 id="探寻主线"><a href="#探寻主线" class="headerlink" title="探寻主线"></a>探寻主线</h2><p>​    一开始使用<code>tcpdump -iany tcp port 8090</code>对8090端口进行抓包，发现在经过三次握手之后服务器与客户端之间就开始了一来一往的包传递，在经过了几个小时之后，包之间的传递戛然而止，查看最后几个包的信息，并<strong>没有看到有关断开连接的四次握手操作</strong>。</p>
 <p>​    Linux操作环境中使用<code>lsof  -i:port</code>检测打开套接字的状态。发现除了一条用于监听8090端口连接的线程外，该端口还建立了多条处于<strong>ETABLISHED</strong>状态的线程。</p>
 <img src="/2018/11/27/修复TCP连接/多个ESTABLISHED状态.jpg" title="多个ESTABLISHED状态">
@@ -216,6 +217,17 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Netty</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
@@ -457,6 +469,22 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">博客配置</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Netty</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">学习笔记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">Session</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>

@@ -202,125 +202,9 @@ var _hmt = _hmt || [];
 </li>
 </ul>
 <p>tip：资源不仅仅与数据库表产生联系，并且也可以指代某项存储数据或者服务。比如用户认证授权时即是对Session资源进行操作，进行银行转账时可以视为对transaction进行操作。</p>
-<p>&lt;!-#-more–&gt;</p>
-<h2 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h2><ul>
-<li><p>Server提供的RESTful API中，URL只使用名词来指定资源(推荐使用复数)，原则上不使用动词。</p>
-</li>
-<li><p>用HTTP协议里的动词来实现资源的CRUD</p>
-<ul>
-<li>GET：获取资源</li>
-<li>POST：新建资源</li>
-<li>PUT：更新资源（客户端提供改变后的资源）</li>
-<li>PATCH：更新资源（客户端提供改变的资源）</li>
-<li>DELETE：删除资源</li>
-<li>HEAD：获取资源的元数据（不常用）</li>
-<li>OPTIONS：获取信息，关于资源的哪些属性是客户端可以改变的（不常用）</li>
-<li>有些客户端只能使用<code>GET</code>和<code>POST</code>这两种方法，服务器必须接受<code>POST</code>模拟其他三种方法。此时客户端发出的HTTP请求，要加上<code>X-HTTP-Method-Override</code>属性覆盖<code>POST</code></li>
-</ul>
-</li>
-<li><p>使用HTTP Status Code 传递Server的状态信息</p>
-</li>
-<li><p>保证HEAD和GET方法是安全的，不会对资源状态有所改变</p>
-</li>
-<li><p>资源的地址推荐采用嵌套结构</p>
-</li>
-<li><p>文档跟API一定同步修改，甚至需要先修改文档</p>
-</li>
-</ul>
-<h2 id="解析URL"><a href="#解析URL" class="headerlink" title="解析URL"></a>解析URL</h2><p>格式：协议://域名/版本/路径?过滤信息</p>
-<ul>
-<li><p>协议：一般使用HTTPS协议</p>
-</li>
-<li><p>版本：应将API的版本号放入URL，为了能够兼容旧版本的API</p>
-</li>
-<li><p>路径：又叫终点，一般来说，路径所用的名词往往跟数据库的表格名对应</p>
-</li>
-<li><p>过滤信息：如果记录数量很多，API应该提供参数过滤返回结果。多级URL最好除了第一级其他级别都用查询字符串表达</p>
-<ul>
-<li>?limit=10：指定返回记录的数量</li>
-<li>?offset=10：指定返回记录的开始位置</li>
-<li>?page=2&amp;per_page=100：指定第几页，以及每页的记录数</li>
-<li>?sortby=name&amp;order=asc：指定返回结果按照哪个属性排序以及排序顺序</li>
-<li>?animal_type_id=1：设置筛选条件</li>
-</ul>
-</li>
-</ul>
-<h2 id="服务器返回信息"><a href="#服务器返回信息" class="headerlink" title="服务器返回信息"></a>服务器返回信息</h2><ul>
-<li><p>状态码(Status Code)：服务器应向用户返回的状态码和提示信息</p>
-<ul>
-<li>200 OK - [GET]：服务器成功返回用户请求的数据，该操作是幂等的（Idempotent）。</li>
-<li>201 CREATED - [POST/PUT/PATCH]：用户新建或修改数据成功。</li>
-<li>202 Accepted - [*]：表示一个请求已经进入后台排队（异步任务）</li>
-<li>204 NO CONTENT - [DELETE]：用户删除数据成功。</li>
-<li>400 INVALID REQUEST - [POST/PUT/PATCH]：用户发出的请求有错误，服务器没有进行新建或修改数据的操作，该操作是幂等的。</li>
-<li>401 Unauthorized - [*]：表示用户没有权限（令牌、用户名、密码错误）。</li>
-<li>403 Forbidden - [*] 表示用户得到授权（与401错误相对），但是访问是被禁止的。</li>
-<li>404 NOT FOUND - [*]：用户发出的请求针对的是不存在的记录，服务器没有进行操作，该操作是幂等的。</li>
-<li>406 Not Acceptable - [GET]：用户请求的格式不可得（比如用户请求JSON格式，但是只有XML格式）。</li>
-<li>410 Gone -[GET]：用户请求的资源被永久删除，且不会再得到的。</li>
-<li>422 Unprocesable entity - [POST/PUT/PATCH] 当创建一个对象时，发生一个验证错误。</li>
-<li>500 INTERNAL SERVER ERROR - [*]：服务器发生错误，用户将无法判断发出的请求是否成功。</li>
-</ul>
-</li>
-<li><p>错误处理(Error handling)：如果状态码是4XX，应该向用户返回出错信息</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">"error"</span>:<span class="string">"Invalid API key"</span>    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>返回结果(Response)：API返回的数据格式应该是一个JSON对象，并且发生错误时不要返回200状态码。针对不同操作，服务器向用户返回的结果应该符合以下规范</p>
-<ul>
-<li>GET /collection：返回资源对象的列表（数组）</li>
-<li>GET /collection/resource：返回单个资源对象</li>
-<li>POST /collection：返回新生成的资源对象</li>
-<li>PUT /collection/resource：返回完整的资源对象</li>
-<li>PATCH /collection/resource：返回完整的资源对象</li>
-<li>DELETE /collection/resource：返回一个空文档</li>
-</ul>
-</li>
-</ul>
-<h2 id="Hypermedia-API"><a href="#Hypermedia-API" class="headerlink" title="Hypermedia API"></a>Hypermedia API</h2><p>RESTful API最好做到Hypermedia，即返回结果中提供链接，连向其他API方法，使得用户不查文档，也知道下一步应该做什么。</p>
-<p>比如，当用户向api.example.com的根目录发出请求，会得到这样一个文档。</p>
-<blockquote>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#123;</span><br><span class="line">&gt;     "link": &#123;</span><br><span class="line">&gt;         "rel":   "collection https://www.example.com/zoos",</span><br><span class="line">&gt;         "href":  "https://api.example.com/zoos",</span><br><span class="line">&gt;         "title": "List of zoos",</span><br><span class="line">&gt;         "type":  "application/vnd.yourformat+json"</span><br><span class="line">&gt;     &#125;</span><br><span class="line">&gt; &#125;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
-</blockquote>
-<p>上面代码表示，文档中有一个link属性，用户读取这个属性就知道下一步该调用什么API了。rel表示这个API与当前网址的关系（collection关系，并给出该collection的网址），href表示API的路径，title表示API的标题，type表示返回类型。</p>
-<p>Hypermedia API的设计被称为<a href="http://en.wikipedia.org/wiki/HATEOAS" target="_blank" rel="noopener">HATEOAS</a>。Github的API就是这种设计，访问<a href="https://api.github.com/" target="_blank" rel="noopener">api.github.com</a>会得到一个所有可用API的网址列表。</p>
-<blockquote>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#123;</span><br><span class="line">&gt;     "current_user_url": "https://api.github.com/user",</span><br><span class="line">&gt;     "authorizations_url": "https://api.github.com/authorizations",</span><br><span class="line">&gt;     // ...</span><br><span class="line">&gt; &#125;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
-</blockquote>
-<p>从上面可以看到，如果想获取当前用户的信息，应该去访问<a href="https://api.github.com/user" target="_blank" rel="noopener">api.github.com/user</a>，然后就得到了下面结果。</p>
-<blockquote>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; &#123;</span><br><span class="line">&gt;     "message": "Requires authentication",</span><br><span class="line">&gt;     "documentation_url": "https://developer.github.com/v3"</span><br><span class="line">&gt; &#125;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
-</blockquote>
-<p>上面代码表示，服务器给出了提示信息，以及文档的网址。</p>
-<h2 id="注意事项："><a href="#注意事项：" class="headerlink" title="注意事项："></a>注意事项：</h2><p><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">理解RESTful架构 –阮一峰</a>一文中指出：</p>
-<blockquote>
-<p>另一个设计误区，就是在URI中加入版本号。</p>
-<p>因为不同的版本，可以理解成同一种资源的不同表现形式，所以应该采用同一个URI。版本号可以在HTTP请求头信息的Accept字段中进行区分（参见<a href="http://www.informit.com/articles/article.aspx?p=1566460" target="_blank" rel="noopener">Versioning REST Services</a>）：</p>
-</blockquote>
-<p><a href="http://www.ruanyifeng.com/blog/2018/10/restful-api-best-practices.html" target="_blank" rel="noopener">RESTful API 最佳实践 –阮一峰</a>一文则指出：</p>
-<blockquote>
-<p>应该将API的版本号放入URL。</p>
-<blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; &gt; https:<span class="comment">//api.example.com/v1/</span></span><br><span class="line">&gt; &gt;</span><br></pre></td></tr></table></figure>
-</blockquote>
-</blockquote>
-<blockquote>
-<p>另一种做法是，将版本号放在HTTP头信息中，但不如放入URL方便和直观。<a href="https://developer.github.com/v3/media/#request-specific-version" target="_blank" rel="noopener">Github</a>采用这种做法。</p>
-</blockquote>
-<p>前者为2011年版本，后者为2014年版本。</p>
-<p>可能是每个时间段的现状或理解不同而造成的差异。</p>
-<p>且目前GitHub API已采用<strong>将API的版本号放入URL</strong></p>
-<p>故应以后者为准。</p>
-<h2 id="存在问题："><a href="#存在问题：" class="headerlink" title="存在问题："></a>存在问题：</h2><ol>
-<li><p>在复杂的系统上，复杂的业务要操作很多种资源的时候URL应该如何体现？当一个资源操作涉及多个数据库表的时候该如何设计URL？</p>
-<p>如果有对该问题有思路的欢迎留言评论。</p>
-</li>
-</ol>
-<h2 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h2><p><a href="http://www.ruanyifeng.com/blog/2014/05/restful_api.html" target="_blank" rel="noopener">RESTful API 设计指南</a></p>
-<p><a href="https://blog.csdn.net/houjixin/article/details/54315835" target="_blank" rel="noopener">优秀REST风格 API的设计原则</a></p>
-<p><a href="https://www.zhihu.com/question/28557115" target="_blank" rel="noopener">知乎上覃超的回答</a></p>
-<p><a href="http://www.ruanyifeng.com/blog/2018/10/restful-api-best-practices.html" target="_blank" rel="noopener">RESTful API 最佳实践 –阮一峰</a></p>
-<p><a href="http://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">理解RESTful架构 –阮一峰</a></p>
-
+        
+          <a class="article-more-a" href="/2018/12/05/Rest架构风格/#more">more >></a>
+        
       
 
       
@@ -328,6 +212,17 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">学习笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
@@ -400,44 +295,9 @@ var _hmt = _hmt || [];
 <li>利用过滤器验证用户权限时，由于<code>httpServletRequest</code>中的输出输入流只能读取一次，导致在过滤器中取出前端发送的请求值，在将其与Session<code>user</code>进行权限验证后，在业务逻辑层再次调用<code>httpServletRequest</code>流时抛出异常。</li>
 <li>由于WebSocket是基于TCP的一种独立实现，跟HTTP没什么关系。在WebSocket进行权限验证时无法拿到Tomcat内置的<code>session</code>。</li>
 </ul>
-<p>&lt;!-#-more–&gt;</p>
-<h2 id="探索路线"><a href="#探索路线" class="headerlink" title="探索路线"></a>探索路线</h2><h3 id="问题1"><a href="#问题1" class="headerlink" title="问题1"></a>问题1</h3><h4 id="只能读一次的原因"><a href="#只能读一次的原因" class="headerlink" title="只能读一次的原因"></a>只能读一次的原因</h4><p>首先要知道为什么<code>httpServletRequest</code>的流只能读取一次。</p>
-<p>调用<code>httpServletRequest.getInputStream()</code>可以看到获取的流类型为<code>ServletInputStream</code>，继承<code>InputStream</code>。</p>
-<p>下面复习下<code>InputStream</code>,<code>InputStream</code>的<code>read</code>方法内部有一个postion，标志当前流读取到的位置，每读取一次，位置就会移动一次，如果读到最后，<code>read()</code>会返回-1，标志已经读取完了。如果想要重新读取则需要重写<code>reset()</code>方法，当然能否reset是有条件的，它取决于<code>markSupported()</code>是否返回true。</p>
-<p>在<code>InputStream</code>源码中默认不实现<code>reset()</code>，并且<code>markSupported()</code>默认返回false：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="comment">// 调用重新读取则抛出异常</span></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"mark/reset not supported"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">markSupported</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 不支持重新读取</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>而查看<code>ServletInputStream</code>源码可以发现，该类没有重写<code>mark()</code>,<code>reset()</code>以及<code>markSupported()</code></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ServletInputStream</span> <span class="keyword">extends</span> <span class="title">InputStream</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">ServletInputStream</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">readLine</span><span class="params">(<span class="keyword">byte</span>[] b, <span class="keyword">int</span> off, <span class="keyword">int</span> len)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (len &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> c;</span><br><span class="line">            <span class="keyword">while</span>((c = <span class="keyword">this</span>.read()) != -<span class="number">1</span>) &#123;</span><br><span class="line">                b[off++] = (<span class="keyword">byte</span>)c;</span><br><span class="line">                ++count;</span><br><span class="line">                <span class="keyword">if</span> (c == <span class="number">10</span> || count == len) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> count &gt; <span class="number">0</span> ? count : -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">isFinished</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">isReady</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">setReadListener</span><span class="params">(ReadListener var1)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="使用HttpServletRequestWrapper"><a href="#使用HttpServletRequestWrapper" class="headerlink" title="使用HttpServletRequestWrapper"></a>使用HttpServletRequestWrapper</h4><p>既然<code>ServletInputStream</code>不支持重新读写，那么为什么不把流读出来后用容器存储起来，后面就可以多次利用了。</p>
-<p>所幸Java提供了一个请求包装器 ：<code>HttpServletRequestWrapper</code>基于装饰者模式实现了<code>HttpServletRequest</code>介面，只需要继承该类并实现你想要重新定义的方法即可。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 代码来自网络，侵删</span><br><span class="line"> */</span><br><span class="line">public class BodyReaderHttpServletRequestWrapper  extends HttpServletRequestWrapper &#123;</span><br><span class="line"></span><br><span class="line">    private final byte[] body;</span><br><span class="line"></span><br><span class="line">    BodyReaderHttpServletRequestWrapper(HttpServletRequest request) &#123;</span><br><span class="line">        super(request);</span><br><span class="line">        String sessionStream = getBodyString(request);</span><br><span class="line">        body = sessionStream.getBytes(Charset.forName(&quot;UTF-8&quot;));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 获取请求Body</span><br><span class="line">     *</span><br><span class="line">     * @param request 请求</span><br><span class="line">     * @return Body字符串</span><br><span class="line">     */</span><br><span class="line">    private String getBodyString(final ServletRequest request) &#123;</span><br><span class="line">        StringBuilder sb = new StringBuilder();</span><br><span class="line">        InputStream inputStream = null;</span><br><span class="line">        BufferedReader reader = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            inputStream = cloneInputStream(request.getInputStream());</span><br><span class="line">            reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName(&quot;UTF-8&quot;)));</span><br><span class="line">            String line = &quot;&quot;;</span><br><span class="line">            while ((line = reader.readLine()) != null) &#123;</span><br><span class="line">                sb.append(line);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        finally &#123;</span><br><span class="line">            if (inputStream != null) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    inputStream.close();</span><br><span class="line">                &#125;</span><br><span class="line">                catch (IOException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            if (reader != null) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    reader.close();</span><br><span class="line">                &#125;</span><br><span class="line">                catch (IOException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 复制输入流</span><br><span class="line">     * @param inputStream 请求输入流</span><br><span class="line">     * @return 复制出来的输入流</span><br><span class="line">     */</span><br><span class="line">    private InputStream cloneInputStream(ServletInputStream inputStream) &#123;</span><br><span class="line">        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();</span><br><span class="line">        byte[] buffer = new byte[1024];</span><br><span class="line">        int len;</span><br><span class="line">        try &#123;</span><br><span class="line">            while ((len = inputStream.read(buffer)) &gt; -1) &#123;</span><br><span class="line">                byteArrayOutputStream.write(buffer, 0, len);</span><br><span class="line">            &#125;</span><br><span class="line">            byteArrayOutputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">        catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public BufferedReader getReader() &#123;</span><br><span class="line">        return new BufferedReader(new InputStreamReader(getInputStream()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public ServletInputStream getInputStream() &#123;</span><br><span class="line"></span><br><span class="line">        final ByteArrayInputStream bais = new ByteArrayInputStream(body);</span><br><span class="line"></span><br><span class="line">        return new ServletInputStream() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public int read() &#123;</span><br><span class="line">                return bais.read();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public boolean isFinished() &#123;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public boolean isReady() &#123;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void setReadListener(ReadListener readListener) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>并且在读取请求流的过滤器中使用该包装器：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">    BodyReaderHttpServletRequestWrapper myRequestWrapper;</span><br><span class="line">    HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 封装请求参数</span></span><br><span class="line">    myRequestWrapper = <span class="keyword">new</span> BodyReaderHttpServletRequestWrapper(httpServletRequest);</span><br><span class="line">    <span class="comment">// 从请求包装器中取出json值</span></span><br><span class="line">    <span class="keyword">int</span> index = <span class="keyword">new</span> Gson().fromJson(servletRequest.getReader(), InteractionData.class).getIndex();</span><br><span class="line">    <span class="comment">// 从请求包装器拿出Session属性user</span></span><br><span class="line">    User user = (User) myRequestWrapper.getSession().getAttribute(<span class="string">"user"</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 将请求包装器传递下</span></span><br><span class="line">    filterChain.doFilter(myRequestWrapper, servletResponse);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这时候就在后面的代码中再次调用流了</p>
-<h3 id="问题二"><a href="#问题二" class="headerlink" title="问题二"></a>问题二</h3><h4 id="存储Session"><a href="#存储Session" class="headerlink" title="存储Session"></a>存储Session</h4><p>既然不能从Tomcat中拿到需要session，那倒可以在用户登陆时先将用户session用Map存储起来，后面便可以在WebSocket中利用Map拿到相应的用户信息。</p>
-<p>首先需要一个用来存储<code>Session</code>的Map容器，使用了单例模式保证有唯一实例，并且使用<code>Map</code>存储了<code>JSESSIONID</code>以及相应的<code>HttpSession</code>：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SessionContext</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> SessionContext instance;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, HttpSession&gt; map;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">SessionContext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> SessionContext <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            instance = <span class="keyword">new</span> SessionContext();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">AddSession</span><span class="params">(HttpSession session)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (session != <span class="keyword">null</span>) &#123;</span><br><span class="line">            map.put(session.getId(), session);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">DelSession</span><span class="params">(HttpSession session)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (session != <span class="keyword">null</span>) &#123;</span><br><span class="line">            map.remove(session.getId());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> HttpSession <span class="title">getSession</span><span class="params">(String session_id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (session_id == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">return</span> map.get(session_id);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>为此需要，一个HttpSession监听器，监听Session的创建与销毁，并相应新增与删除Map集合中的键值对：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@WebListener</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SessionListener</span> <span class="keyword">implements</span> <span class="title">HttpSessionListener</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> SessionContext sessionContext = SessionContext.getInstance();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionCreated</span><span class="params">(HttpSessionEvent httpSessionEvent)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">"创建Session"</span>);</span><br><span class="line">        sessionContext.AddSession(httpSessionEvent.getSession());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sessionDestroyed</span><span class="params">(HttpSessionEvent httpSessionEvent)</span> </span>&#123;</span><br><span class="line">        HttpSession session = httpSessionEvent.getSession();</span><br><span class="line">        sessionContext.DelSession(session);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>最后使用一个WebSocket拦截器，在连接之前进行用户身份的认证：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WebSocketInterceptor</span> <span class="keyword">implements</span> <span class="title">HandshakeInterceptor</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">beforeHandshake</span><span class="params">(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse,</span></span></span><br><span class="line"><span class="function"><span class="params">                                   WebSocketHandler webSocketHandler, Map&lt;String, Object&gt; map)</span> </span>&#123;</span><br><span class="line">        </span><br><span class="line">        log.info(<span class="string">"webSocket握手请求..."</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (serverHttpRequest <span class="keyword">instanceof</span> ServletServerHttpRequest) &#123;</span><br><span class="line">            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) serverHttpRequest;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 得到放在url后面的JSESSIONID</span></span><br><span class="line">            String jSessionId = servletRequest.getServletRequest().getParameter(<span class="string">"JSESSIONID"</span>);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 得到Map单例类实例</span></span><br><span class="line">            SessionContext sessionContext = SessionContext.getInstance();</span><br><span class="line">            <span class="comment">// 得到用户session</span></span><br><span class="line">            HttpSession httpSession = sessionContext.getSession(jSessionId);</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">null</span> != httpSession) &#123;</span><br><span class="line">                User user = (User) httpSession.getAttribute(<span class="string">"user"</span>);</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">null</span> != user) &#123;</span><br><span class="line">                    <span class="comment">// 通过</span></span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 拦截该连接</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterHandshake</span><span class="params">(ServerHttpRequest serverHttpRequest, ServerHttpResponse serverHttpResponse,</span></span></span><br><span class="line"><span class="function"><span class="params">                               WebSocketHandler webSocketHandler, Exception e)</span> </span>&#123;</span><br><span class="line">        log.info(<span class="string">"webSocket握手结束..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="请求header认证"><a href="#请求header认证" class="headerlink" title="请求header认证"></a>请求header认证</h4><p>若系统使用<code>spring-session-redis</code>进行Session的管理，可以使用请求header验证</p>
-<p>配置HttpSessionConfig配置类：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@EnableRedisHttpSession</span>(maxInactiveIntervalInSeconds= <span class="number">1800</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HttpSessionConfig</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> HeaderHttpSessionIdResolver <span class="title">httpSessionStrategy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> HeaderHttpSessionIdResolver(<span class="string">"x-auth-token"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>此时可以发现登陆后返回的 header头部信息中含有<code>x-auth-token</code>参数，将该参数作为请求头文件即可使用session验证。同时该参数为session的id，可以根据redis的<code>spring:session:sessions:+ sessionId</code>拿去到相应的用户信息。</p>
-<p>目前使用存在许多问题，包括每次发起请求服务器都会存储一个session并返回该session的Id，长此以往，redis将被一堆无用session填满。因此还没有找到一个适合的能够替代上面的解决方法，如果有好的方法欢迎留言。</p>
-<h2 id="拓展"><a href="#拓展" class="headerlink" title="拓展"></a>拓展</h2><h3 id="SpringSession"><a href="#SpringSession" class="headerlink" title="SpringSession"></a>SpringSession</h3><p>利用Spring Session可以使得Session脱离Tomcat本地的限制，在分布式系统上可以很轻松地实现Session共享。</p>
-<h3 id="JSON-Web-Token"><a href="#JSON-Web-Token" class="headerlink" title="JSON Web Token"></a>JSON Web Token</h3><p>除了Session认证，JWT认证也不失为一个好方案，能够实现单点登录以及用户认证。</p>
-<p>服务器认证以后，生成一个 JSON 对象，发回给用户，就像下面这样。</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"userId"</span>:<span class="number">1</span>,</span><br><span class="line">    <span class="attr">"userPhone"</span>:<span class="number">1213213123</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>用户与服务器通信时，服务器根据JSON对象判断用户身份，同时为了防止用户用户篡改数据，利用加密算法生成签名，并附在一个字符串中并返回给用户。</p>
-<p>利用JWT认证服务器可以不用存储Session数据，减少了内存的负担。但还是存在着许多问题，包括：</p>
-<ul>
-<li>敏感信息不能使用JWT传递</li>
-<li>JWT是无状态的导致服务器无法及时注销或修改用户信息，一旦JWT签发了，除非服务器部署额外的逻辑，否则在到期之前就会始终有效。</li>
-<li>JWT续签问题</li>
-</ul>
-
+        
+          <a class="article-more-a" href="/2018/12/02/关于Session认证的探索/#more">more >></a>
+        
       
 
       
@@ -445,6 +305,17 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Session</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
@@ -519,26 +390,9 @@ var _hmt = _hmt || [];
 <li>使用在MarkDown中使用下面指令导入图片文件夹中的图片</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% asset_img 图片.jpg 图片说明 %&#125;</span><br></pre></td></tr></table></figure>
-<p>&lt;!-#-more–&gt;</p>
-<h2 id="引入disqus评论系统"><a href="#引入disqus评论系统" class="headerlink" title="引入disqus评论系统"></a>引入disqus评论系统</h2><ul>
-<li>登陆<code>https://disqus.com/</code>注册账号</li>
-<li>点击首页的<code>GET STARTED</code>按钮，之后选择<code>I want to install Disqus on my site</code> 选项。填写<code>Websit Name</code>即<code>short name</code>。随便填写<code>Category</code>以及<code>Language</code>。</li>
-<li>在左侧点击<code>Configure Disqus</code>。或者点击右上角的<code>Edit Profile</code>，再点击左侧栏的<code>Profile</code>。在<code>Website URL</code>与<code>Location</code>中填写自己的博客地址。若是<code>GitHub Pages</code>则填写<code>https://github.com/your_name/your_name.github.io</code></li>
-<li>在hexo站点配置<code>_config.yml</code>中配置</li>
-</ul>
-<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 填写你自己的 shortname</span></span><br><span class="line"><span class="attr">disqus_shortname:</span> <span class="string">short</span> <span class="string">name</span> <span class="comment">##注册时填写的short name</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>重新启动</li>
-</ul>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure>
-<h2 id="HTTPS"><a href="#HTTPS" class="headerlink" title="HTTPS"></a>HTTPS</h2><ul>
-<li>申请一个域名，并将子域名解析至<code>your_name.github.io</code>中。</li>
-<li>在<code>your_name.github.io</code>主页上新增文件<code>CNAME</code>，里面填写要使用的子域名</li>
-<li>在<code>your_name.github.io</code>主页上依次点击<code>Settings</code>-&gt;<code>GitHub Pages</code>。将子域名保存至<code>Custom domain</code>中并选取Enforce HTTPS </li>
-<li>此时即可使用域名重定向到你的博客中</li>
-</ul>
-<h2 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h2><p>​    若有错误或补充请不吝赐教，谢谢。</p>
-
+        
+          <a class="article-more-a" href="/2018/11/30/Blog/#more">more >></a>
+        
       
 
       
@@ -546,6 +400,17 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">博客配置</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
@@ -612,24 +477,9 @@ var _hmt = _hmt || [];
     <div class="article-entry" itemprop="articleBody">
       
         <h1 id="Netty使用TCP连接错误"><a href="#Netty使用TCP连接错误" class="headerlink" title="Netty使用TCP连接错误"></a>Netty使用TCP连接错误</h1><h2 id="表面原因"><a href="#表面原因" class="headerlink" title="表面原因"></a>表面原因</h2><p>​    在与嵌入式组进行TCP连接时发生未知错误导致<strong>服务器接收不到数据</strong>。并且Netty封装的exceptionCaught方法以及channelInactive方法<strong>捕获不到任何的报错异常以及连接断开情况。</strong></p>
-<p>&lt;!-#-more–&gt;</p>
-<h2 id="探寻主线"><a href="#探寻主线" class="headerlink" title="探寻主线"></a>探寻主线</h2><p>​    一开始使用<code>tcpdump -iany tcp port 8090</code>对8090端口进行抓包，发现在经过三次握手之后服务器与客户端之间就开始了一来一往的包传递，在经过了几个小时之后，包之间的传递戛然而止，查看最后几个包的信息，并<strong>没有看到有关断开连接的四次握手操作</strong>。</p>
-<p>​    Linux操作环境中使用<code>lsof  -i:port</code>检测打开套接字的状态。发现除了一条用于监听8090端口连接的线程外，该端口还建立了多条处于<strong>ETABLISHED</strong>状态的线程。</p>
-<img src="/2018/11/27/修复TCP连接/多个ESTABLISHED状态.jpg" title="多个ESTABLISHED状态">
-<p>​    由于客户端只有一个，在查阅了资料发现在一台客户端与服务器的TCP连接中，处于连接状态，即<strong>ETABLISHED</strong>状态的线程应该只有一条。</p>
-<p>​    于是尝试使用<code>kill -9 port</code>杀死了目前正在运行的Java项目，同时可以观测到除了监听线程被关闭外，其他8090端口的线程<strong>都处于FIN-WAIT-1状态</strong>，即正在等待客户端返回ACK与FIN。但很明显，客户端没能够返回该信号而导致该线程一直处于该状态。直到几分钟过去了，服务器强制关闭了这些线程。</p>
-<img src="/2018/11/27/修复TCP连接/多个FIN_WAIT1状态.jpg" title="多个FIN_WAIT1状态">
-<p>​    此处查看了网络上的资料，发现当服务器出现很多ESTABLISHED状态时，可能是这时候若客户端断开的时候未发送FIN包，则服务端处还是显示ESTABLISHED状态；</p>
-<p>​    结果客户端重新连接服务器。而新连接上来的客户端（也就是刚才断掉的重新连上来了）在服务端肯定是ESTABLISHED; </p>
-<p>​    如果客户端重复的上演这种情况，那么服务端将会出现大量的假的ESTABLISHED连接和CLOSE_WAIT连接。最终结果就是新的其他客户端无法连接上来，但是利用netstat还是能看到一条连接已经建立，并显示ESTABLISHED，但始终无法进入程序代码。</p>
-<p>​    这时想起最初的时候嵌入式组为了防止服务器的断线，每隔几分钟便断开连接并重新连接。此时可能由于网络上的问题，导致断开的信息服务器未能接收到，这样就造成了上述的情况。在本地电脑跑的时候没有这么频繁的断开事故可能就是网络的原因。</p>
-<p>​    <strong>那么阿里云的网络有这么差么？</strong>经过下面测试。。emmm。。看来发送个几百条断开信号但因为网络原因漏掉几条也没什么不对的。。</p>
-<img src="/2018/11/27/修复TCP连接/ping超时.png" title="ping超时">
-<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>​    使用正则表达式对嵌入式发送的数据进行匹配，若发现不符合数据格式则抛出异常并断开连接，防止影响后面的数据库操作。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\b\w*:V_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,I_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,P_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,PF_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,F_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*,W_\d:[<span class="number">0</span>-<span class="number">9</span>]+[.][<span class="number">0</span>-<span class="number">9</span>]*\bend</span><br></pre></td></tr></table></figure>
-<p>​    与嵌入式端协调，取消每隔几分钟断开重连的机制。</p>
-<p>​    使用心跳机制，当服务器在一定时间内没有接收到客户端发来的信息时则断开连接，同时在接收到客户端信息的同时发送响应信息，让嵌入式方面进行相应的操作。</p>
-
+        
+          <a class="article-more-a" href="/2018/11/27/修复TCP连接/#more">more >></a>
+        
       
 
       
@@ -637,6 +487,17 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Netty</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
@@ -704,9 +565,7 @@ var _hmt = _hmt || [];
       
         <h1 id="文件系统操作"><a href="#文件系统操作" class="headerlink" title="文件系统操作"></a>文件系统操作</h1><p>ln -s 源文件 目标文件</p>
 <ul>
-<li><p>使用软链接的话，原文件要写绝对路径</p>
-</li>
-<li></li>
+<li>使用软链接的话，原文件要写绝对路径</li>
 </ul>
 <p>updatedb：强制更新后台数据库</p>
 <p>whereis 命令名：搜索命令所在路径及帮助文档所在路径</p>
@@ -738,479 +597,9 @@ var _hmt = _hmt || [];
 <li><p>date：当前日期</p>
 </li>
 </ul>
-<h3 id="关机重启"><a href="#关机重启" class="headerlink" title="关机重启"></a>关机重启</h3><p>重启指令：</p>
-<ul>
-<li>reboot</li>
-<li>shutdown -r now 立刻重启(root用户使用)</li>
-<li>shutdown -r 10 过10分钟自动重启(root用户使用)</li>
-<li>shutdown -r 20:35 在时间为20:35时候重启(root用户使用)</li>
-</ul>
-<p>如果是通过shutdown命令设置重启的话，可以用shutdown -c命令取消重启</p>
-<p>关机命令：</p>
-<ul>
-<li>halt 立刻关机</li>
-<li>poweroff 立刻关机</li>
-<li>shutdown -h now 立刻关机(root用户使用)</li>
-<li>shutdown -h 10 10分钟后自动关机</li>
-</ul>
-<p>如果是通过shutdown命令设置关机的话，可以用shutdown -c命令取消重启</p>
-<h3 id="前端后台"><a href="#前端后台" class="headerlink" title="前端后台"></a>前端后台</h3><p><strong>ctrl-c:</strong>  ( kill foreground process ) 发送 SIGINT 信号给前台进程组中的所有进程，强制终止程序的执行；</p>
-<p><strong>ctrl-z:</strong>  ( suspend foreground process ) 发送 SIGTSTP 信号给前台进程组中的所有进程，将一个正在前台执行的命令放到后台，并且暂停。常用于挂起一个进程，而并非结束进程。</p>
-<p><strong>&amp;:</strong>用在一个命令的最后，可以把这个命令放到后台执行</p>
-<p><strong>jobs:</strong>查看当前有多少在后台运行的命令</p>
-<p><strong>fg:</strong>将后台中的命令调至前台继续运行。如果后台中有多个命令，可以用 fg %jobnumber将选中的命令调出。</p>
-<p><strong>bg:</strong>将一个在后台暂停的命令，变成继续执行如果后台中有多个命令，可以用bg %jobnumber将选中的命令调出。</p>
-<p><strong>ps:</strong>列出系统中正在运行的进程；</p>
-<h2 id="文件搜索"><a href="#文件搜索" class="headerlink" title="文件搜索"></a>文件搜索</h2><p>find 搜索范围 搜索条件</p>
-<ul>
-<li>/：根目录下搜索</li>
-<li>-name 文件名：按文件名搜索，精确搜索。</li>
-<li>-iname 文件名：不区分大小写</li>
-<li>-user 文件名：按照所有者搜索</li>
-<li>-nouser 文件名：查找没有所有者的文件</li>
-<li>-mtime +10 查找10天前修改的文件<ul>
-<li>-10 十天内修改文件</li>
-<li>10 十天当天修改的文件</li>
-<li>+10 十天前修改的文件</li>
-<li>atime 文件访问时间</li>
-<li>ctime 改变文件属性</li>
-<li>mtime 修改文件内容</li>
-</ul>
-</li>
-<li><p>-size 25k</p>
-<ul>
-<li>-25k 小于25KB的文件</li>
-<li>25k 等于25KB的文件</li>
-<li>+25KB 大于25KB的文件</li>
-</ul>
-</li>
-<li><p>-inum 243333 查找i节点是243333的文件</p>
-</li>
-<li><p>若要模糊搜索则需使用通配符：* ? [] 需要两边加双引号</p>
-</li>
-<li>只能用k,M.不写则默认是扇区(512M )</li>
-</ul>
-<p>多命令查询，尾部添加</p>
-<ul>
-<li>-a 逻辑与</li>
-<li>-o 逻辑或 </li>
-<li>-exec 命令 {}\ 对搜索结果进行操作</li>
-</ul>
-<p>grep：字符串部分匹配</p>
-<p>locate 文件名：快速查找文件</p>
-<ul>
-<li>/var/lib/mlocate中维护着一个后台数据库，一天更一次</li>
-<li>只能按照文件名搜索</li>
-<li>/etc/updatedb.conf维护着一个配置文件</li>
-</ul>
-<h2 id="帮助命令"><a href="#帮助命令" class="headerlink" title="帮助命令"></a>帮助命令</h2><ul>
-<li><p>man 命令：查看命令详情</p>
-<ul>
-<li>-f：精确查看命令等级</li>
-<li>-k：关键词查看命令等级</li>
-<li>/ ？：向上或向下搜寻</li>
-<li>n,N：搜寻时，向下或向上查询</li>
-<li>q：结束本次man</li>
-</ul>
-<p>内容说明：<br>NAME：简短的挃令、数据名称说明<br>SYNOPSIS：简短的挃令下达语法(syntax)简介<br>DESCRIPTION：较为完整的说明，这部分最好仔细看看！<br>OPTIONS：针对 SYNOPSIS 部分中，有列丼的所有可用的选项说明<br>COMMANDS：当这个程序(软件)在执行的时候，可以在此程序(软件)中下达的挃令<br>FILES：这个程序戒数据所使用戒参考戒连结到的某些档案<br>SEE ALSO：可以参考的，跟这个挃令戒数据有相关的其他说明！<br>EXAMPLE：一些可以参考的范例<br>BUGS：是否有相关的臭虫！</p>
-</li>
-</ul>
-<p>whatis 命令：查看命令等级，相当于man -f</p>
-<p>apropos 命令：查看所有包含命令关键字的命令</p>
-<p>help：命令后缀，查看指令参数信息</p>
-<p>hepl shell内部命令：获取shell内部命令的操作</p>
-<p>info 命令：把所有的命令记录都给出来</p>
-<ul>
-<li>-回车：进入子帮助页面（带*标记）</li>
-<li>-u：进入上层页面</li>
-<li>-n：进入下一个帮助小节</li>
-<li>-p：进入上一个帮助小节</li>
-<li>-q：退出</li>
-</ul>
-<h2 id="压缩命令"><a href="#压缩命令" class="headerlink" title="压缩命令"></a>压缩命令</h2><p>zip 压缩文件名 源文件：压缩文件</p>
-<ul>
-<li>-r：压缩目录</li>
-</ul>
-<p>unzip 压缩文件：解压缩</p>
-<p>gzip 源文件：压缩为.gz格式的压缩文件，源文件会消失</p>
-<ul>
-<li>-c 源文件 &gt; 压缩文件：压缩为.gz格式，源文件保留</li>
-<li>-r 目录：压缩目录下所有的子文件，但不能压缩目录</li>
-<li>-d 压缩文件：解压缩</li>
-</ul>
-<p>gunzip 压缩文件：解压缩文件</p>
-<p>bzip2 源文件：压缩为.bz2格式，不保留源文件</p>
-<ul>
-<li>-k 源文件：压缩之后保留源文件</li>
-<li>不能压缩目录</li>
-<li>-d 压缩文件：解压缩,-k保留压缩文件</li>
-</ul>
-<p>bunzip2 压缩文件：解压缩</p>
-<ul>
-<li>-k：保留压缩文件</li>
-</ul>
-<h2 id="目录操作"><a href="#目录操作" class="headerlink" title="目录操作"></a>目录操作</h2><h3 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h3><p>touch [-acdmt] 文件：创建文件</p>
-<ul>
-<li>-a：仅修订 access time；</li>
-<li>-c ：仅修改文件的时间，若该文件不存在则不创建新文件；</li>
-<li>-d ：后面可以接欲修订的日期而不用目前的日期，也可以使用 –date=”日期或时间”</li>
-<li>-m ：仅修改 mtime ；</li>
-<li>-t ：后面可以接欲修订的时间而不用目前的时间，格式为[YYYYMMDDhhmm]</li>
-</ul>
-<p>mkdir [-mp]：目录名：递归创建目录</p>
-<ul>
-<li>-m：设置文件的权限</li>
-<li>-p：递归创建</li>
-</ul>
-<h3 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h3><p>rm 命令 目录</p>
-<ul>
-<li>-r：递归删除</li>
-<li>-f：强制删除</li>
-<li>-i：删除前询问</li>
-</ul>
-<p>rmdir [-p] 目录名称： 删除空目录</p>
-<ul>
-<li>-p：删除多个空目录</li>
-</ul>
-<p>cp 选项 源文件或目录 目标目录</p>
-<ul>
-<li>-r：复制目录</li>
-<li>-p：连带文件属性复制</li>
-<li>-d：若源文件是链接文件，则复制链接属性</li>
-<li>-a：相当于-dr –perservr=all</li>
-<li>-i：若目标文件已存在，在覆盖时会先询问动作的进行</li>
-<li>-u：当目标文件与来源文件有差异的时候才会进行复制</li>
-<li>-l：进行硬式链接的链接文件创建</li>
-<li>-s：复制成为符号链接文件</li>
-</ul>
-<p>mv 原文件或目录 目标文件：移动源文件到目标</p>
-<ul>
-<li>-f：若目标文件已错在，在覆盖时会先询问动作的进行</li>
-<li>-i：若已存在则询问</li>
-<li>-u：当目标文件与来源文件有差异的时候才会进行复制</li>
-</ul>
-<p>ls 显示当前目录下的文件夹和文件</p>
-<ul>
-<li>-a：显示所有文件，包括隐藏文件</li>
-<li>-l：显示详细信息</li>
-<li>-d：查看目录属性</li>
-<li>-h：人性化显示文件大小</li>
-<li><p>-i：显示inode</p>
-</li>
-<li><p>mtime(modification time)：文件更新时间，ctime(status time)：文件状态更改时间，atime(access time)：文件内容取用时间</p>
-</li>
-</ul>
-<p>df：意思为kisk-free，显示Linux系统上可用和已使用的磁盘空间</p>
-<ul>
-<li>-h：以人类可读的格式显示磁盘空间</li>
-<li>-a：显示文件系统的完整磁盘使用情况</li>
-<li>-T：显示磁盘使用情况以及每个块的文件系统类型</li>
-<li>-i：显示已使用和未使用的inode</li>
-</ul>
-<p>du：显示文件，目录等的磁盘使用情况</p>
-<ul>
-<li>-h：以人类可读的方式显示所有目录和子目录的磁盘使用情况</li>
-<li>-a：显示所有文件的磁盘使用情况</li>
-<li>-s：提供特定文件或目录使用的总磁盘空间</li>
-</ul>
-<p>stat 文件/目录：显示文件/目录或文件系统的啊大小和其他同级情况</p>
-<p>fdisk -l：显示磁盘大小以及磁盘分区信息</p>
-<p>cd [相对路径或绝对路径]：访问目录</p>
-<ul>
-<li>cd - ：返回最近访问的目录</li>
-<li>cd ~root：表示去root这个使用者的主文件夹</li>
-<li>cd ..：进入上一级目录</li>
-<li>cd .：进入当前目录</li>
-<li>cd ~：返回当前用户的home目录 </li>
-</ul>
-<p>pwd [-P]：打印当前所在路径</p>
-<ul>
-<li>-P：显示出确实的路径，而非使用链接路径</li>
-</ul>
-<p>查阅文件内容：</p>
-<p>​    cat：由第一行开始显示文件内容<br>​    tac：从最后一行开始显示，可以看出 tac  是 cat  的倒着写！<br>​    nl：显示的时候，顺道输出行号！<br>​    more：一页一页的显示文件内容<br>​    less：与 more  类似，但是比 more  更好的是，他可以往前翻页！<br>​    head：只看头几行<br>​    tail：只看尾巴几行<br>​    od：以二进制的方式读取文件内容！</p>
-<p>ip addr：查看ip地址</p>
-<p>echo $PATH 查看环境变量</p>
-<h1 id="用户操作"><a href="#用户操作" class="headerlink" title="用户操作"></a>用户操作</h1><h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><ul>
-<li>who：查看哪些用户在线</li>
-</ul>
-<h2 id="用户切换"><a href="#用户切换" class="headerlink" title="用户切换"></a>用户切换</h2><ul>
-<li>从user用户切换到root用户：sudo su或者su root</li>
-<li>从root用户切回user用户：su user或是直接输入exit，也可Ctrl+D组合键退出</li>
-<li>设置密码：sudo passwd root</li>
-<li>禁用root登陆：sudo passwd -l root</li>
-<li>启用root登陆：sudo passwd -u root</li>
-</ul>
-<p>用户信息存储：/etc/passwd  /etc/shadow</p>
-<h2 id="创建用户"><a href="#创建用户" class="headerlink" title="创建用户"></a>创建用户</h2><ul>
-<li>adduser 用户名：创建用户</li>
-<li>passwd 用户名：初始化密码</li>
-</ul>
-<h2 id="用户授权"><a href="#用户授权" class="headerlink" title="用户授权"></a>用户授权</h2><ul>
-<li>查找权限管理命令的文件路径</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# whereis sudoers</span><br></pre></td></tr></table></figure>
-<ul>
-<li>查看权限</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# ls -l /etc/sudoers</span><br><span class="line">-r--r----- 1 root root 4251 9月  25 15:08 /etc/sudoers</span><br></pre></td></tr></table></figure>
-<ul>
-<li>添加w权限</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# chmod -v u+w /etc/sudoers</span><br><span class="line">mode of "/etc/sudoers" changed from 0440 (r--r-----) to 0640 (rw-r-----)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>追加新增的用户</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# vim /etc/sudoers</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># Allow root to run any commands anywher  </span></span></span><br><span class="line">root    ALL=(ALL)       ALL  </span><br><span class="line">zhangbiao  ALL=(ALL)       ALL  #这个是新增的用户</span><br></pre></td></tr></table></figure>
-<ul>
-<li>wq保存退出，将写权限收回</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# chmod -v u-w /etc/sudoers</span><br><span class="line">mode of "/etc/sudoers" changed from 0640 (rw-r-----) to 0440 (r--r-----)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>将最后一个<code>ALL</code>修改成<code>NOPASSWD: ALL</code>。可以无需输入密码登陆</li>
-</ul>
-<p>ifconfig -a 查看ip地址</p>
-<h1 id="权限管理"><a href="#权限管理" class="headerlink" title="权限管理"></a>权限管理</h1><p>chgrp [-R] dirname/filename：改变文件所属群组</p>
-<p>chown [-R] 账号名称[:群组名称] 文件或目录：改变文件拥有者</p>
-<ul>
-<li>递归更改</li>
-</ul>
-<p>chmod [-R] xyz 文件或目录 ：改变文件的权限</p>
-<ul>
-<li>r:4 w:2 x:1</li>
-<li>u:user g:group o:others +：增加权限 -：删除权限 =置换权限</li>
-</ul>
-<h1 id="网络状态"><a href="#网络状态" class="headerlink" title="网络状态"></a>网络状态</h1><h1 id="功能实现"><a href="#功能实现" class="headerlink" title="功能实现"></a>功能实现</h1><h2 id="根据端口杀死进程"><a href="#根据端口杀死进程" class="headerlink" title="根据端口杀死进程"></a>根据端口杀死进程</h2><ul>
-<li>netstat -nlp</li>
-<li>netstat -nlp | grep :3306  使用grep筛选出3306端口</li>
-<li>netstat -nlp | grep :3306 | awk ‘{print $7}’ 使用tab字符切割取第7个字段</li>
-<li>netstat -nlp | grep :3306 | awk ‘{print $7}’ | awk -F”/“ ‘{ print $1 }’ 使用/符号切割，取第一个部分</li>
-<li>kill [‘]netstat -nlp | grep :3306 | awk ‘{print $7}’ | awk -F”/“ ‘{ print $1 }’[‘]</li>
-</ul>
-<h2 id="监控TCP"><a href="#监控TCP" class="headerlink" title="监控TCP"></a>监控TCP</h2><ul>
-<li><p>netstat -nat：查看TCP各个状态的数量</p>
-</li>
-<li><p>lsof  -i:port：可以检测到打开套接字的状况</p>
-</li>
-<li><p>sar -n SOCK：查看tcp创建的连接数</p>
-</li>
-<li><p>tcpdump -iany tcp port 9000：对tcp端口为9000的进行抓包</p>
-</li>
-<li>netstat -n | awk ‘/^tcp/ {++y[$NF]} END {for(w in y) print w, y[w]}’：查看TCP状态统计</li>
-</ul>
-<h1 id="工具使用"><a href="#工具使用" class="headerlink" title="工具使用"></a>工具使用</h1><h2 id="vim编辑器"><a href="#vim编辑器" class="headerlink" title="vim编辑器"></a>vim编辑器</h2><p>:q! 不保存并推出</p>
-<p>:w 保存</p>
-<p>:q 退出</p>
-<h2 id="nohub进程挂起"><a href="#nohub进程挂起" class="headerlink" title="nohub进程挂起"></a>nohub进程挂起</h2><ul>
-<li>使用</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup Commond &amp;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>查看本地是否有该工具</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">which nohup</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如果没有则安装nohup</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install coreutils</span><br></pre></td></tr></table></figure>
-<ul>
-<li>到当前用户的根目录</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd</span><br><span class="line">vi .bash_profile</span><br></pre></td></tr></table></figure>
-<ul>
-<li>在原来后边加上<code>:/usr/bin</code>，保存，退出 </li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PATH=$PATH:$HOME/bin:/usr/bin</span><br></pre></td></tr></table></figure>
-<ul>
-<li>使文件生效</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source ~/.bash_profile</span><br></pre></td></tr></table></figure>
-<ul>
-<li>查看版本号</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nohup --version</span><br></pre></td></tr></table></figure>
-<h2 id="screen进程调度"><a href="#screen进程调度" class="headerlink" title="screen进程调度"></a>screen进程调度</h2><p><a href="https://www.cnblogs.com/mchina/archive/2013/01/30/2880680.html" target="_blank" rel="noopener">https://www.cnblogs.com/mchina/archive/2013/01/30/2880680.html</a></p>
-<ul>
-<li>screen的安装</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install screen</span><br></pre></td></tr></table></figure>
-<ul>
-<li>查看版本</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -version</span><br></pre></td></tr></table></figure>
-<ul>
-<li>创建一个新窗口</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -S new_windows</span><br></pre></td></tr></table></figure>
-<ul>
-<li>查看全部screen会话</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -ls</span><br></pre></td></tr></table></figure>
-<ul>
-<li>重新连接会话</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -r ID</span><br></pre></td></tr></table></figure>
-<ul>
-<li>清除dead会话</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -wipe</span><br></pre></td></tr></table></figure>
-<ul>
-<li>会话共享</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -x</span><br></pre></td></tr></table></figure>
-<ul>
-<li>发送命令到screen会话</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">screen -S sandy -X screen ping www.baidu.com</span><br></pre></td></tr></table></figure>
-<p>快捷键</p>
-<ul>
-<li><p>Ctrl-a w：列出当前所有窗口</p>
-</li>
-<li><p>Ctrl-a d：暂时断开screen会话</p>
-</li>
-<li><p>Ctrl-a k:杀死当前的窗口，同时结束当前窗口中运行的进程</p>
-</li>
-<li>Ctrl-a s：锁定会话</li>
-<li>Ctrl-a q：解锁会话</li>
-<li>Ctrl-a x：锁定会话，需要输入密码才能继续访问</li>
-</ul>
-<h2 id="lsof系统监视"><a href="#lsof系统监视" class="headerlink" title="lsof系统监视"></a>lsof系统监视</h2><p><a href="http://man.linuxde.net/lsof" target="_blank" rel="noopener">http://man.linuxde.net/lsof</a></p>
-<p>安装：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install lsof</span><br></pre></td></tr></table></figure>
-<p><strong>lsof：</strong></p>
-<ul>
-<li>-a：列出打开文件存在的进程；</li>
-<li>-c&lt;进程名&gt;：列出指定进程所打开的文件；</li>
-<li>-g：列出GID号进程详情；</li>
-<li>-d&lt;文件号&gt;：列出占用该文件号的进程；</li>
-<li>+d&lt;目录&gt;：列出目录下被打开的文件；</li>
-<li>+D&lt;目录&gt;：递归列出目录下被打开的文件；</li>
-<li>-n&lt;目录&gt;：列出使用NFS的文件；</li>
-<li>-i&lt;条件&gt;：列出符合条件的进程。（4、6、协议、:端口、 @ip ）</li>
-<li>-p&lt;进程号&gt;：列出指定进程号所打开的文件；</li>
-<li>-u：列出UID号进程详情；</li>
-<li>-h：显示帮助信息；</li>
-<li>-v：显示版本信息。</li>
-</ul>
-<p><strong>lsof输出各列信息的意义如下：</strong></p>
-<p><img src="/25/Linux/Users\Administrator\AppData\Roaming\Typora\typora-user-images\1539782619506.png" alt="1539782619506"></p>
-<ul>
-<li>COMMAND：进程的名称</li>
-<li>PID：进程标识符</li>
-<li>PPID：父进程标识符（需要指定-R参数）</li>
-<li>USER：进程所有者</li>
-<li>PGID：进程所属组</li>
-<li>FD：文件描述符，应用程序通过文件描述符识别该文件。</li>
-</ul>
-<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><h2 id="Ubuntu"><a href="#Ubuntu" class="headerlink" title="Ubuntu"></a>Ubuntu</h2><h3 id="jdk环境配置"><a href="#jdk环境配置" class="headerlink" title="jdk环境配置"></a>jdk环境配置</h3><ol>
-<li><p>官网下载JDK文件jdk-8u121-linux-x64.tar.gz</p>
-</li>
-<li><p>在opt文件夹下创建一个目录作为JDK的安装目录，比如/opt/java</p>
-</li>
-<li><p>移动文件到/opt/java目录下</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mv jdk-8u121-linux-x64.tar.gz /opt/java</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>解压文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /opt/java</span><br><span class="line">tar -zxvf jdk-8u121-linux-x64.tar.gz</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>配置环境变量</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gedit /etc/environment</span><br></pre></td></tr></table></figure>
-<p>末尾加入：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">PATH</span>=<span class="string">"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:$JAVA_HOME/bin"</span></span><br><span class="line">export CLASSPATH=.:$JAVA_HOME/lib:$JAVA_HOME/jre/lib</span><br><span class="line">export JAVA_HOME=/opt/java/jdk1.8.0_121</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>保存并使环境变量生效</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source /etc/environment</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>判断是否配置成功</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<p><strong>存在问题：</strong></p>
-<p>每次重启后就用不了了</p>
-<p><strong>解决方法：</strong></p>
-<p>还需要<strong>配置所有用户的环境变量</strong></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo gedit /etc/profile</span><br></pre></td></tr></table></figure>
-<p>在文件的最后添加以下内容：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#set Java environment</span></span><br><span class="line">export JAVA_HOME=/opt/java/jdk1.8.0_121</span><br><span class="line">export JRE_HOME=$JAVA_HOME/jre</span><br><span class="line">export CLASSPATH=.:$JAVA_HOME/lib:$JRE_HOME/lib:$CLASSPATH</span><br><span class="line">export PATH=$JAVA_HOME/bin:$JRE_HOME/bin:$PATH</span><br></pre></td></tr></table></figure>
-<p>保存并使环境变量生效</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
-<h3 id="Mysql配置"><a href="#Mysql配置" class="headerlink" title="Mysql配置"></a>Mysql配置</h3><p>​    默认情况下，只有最新版本的 MySQL 包含在 APT 软件包存储库中</p>
-<ol>
-<li>只需更新服务器上的包索引并安装默认包 apt-get。</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install mysql-server</span><br></pre></td></tr></table></figure>
-<ol>
-<li>配置</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 安装配置</span><br><span class="line">sudo mysql_secure_installation</span><br><span class="line">// 检查mysql服务状态</span><br><span class="line">systemctl status mysql.service</span><br></pre></td></tr></table></figure>
-<ol>
-<li>后续操作</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 进入mysql</span></span><br><span class="line">sudo mysql -uroot -p</span><br><span class="line"><span class="meta">#</span><span class="bash"> 给root设置密码</span></span><br><span class="line">GRANT ALL PRIVILEGES ON *.* TO root@localhost IDENTIFIED BY "123456";</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建数据库weixx</span></span><br><span class="line">CREATE DATABASE weixx;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建用户wxx(密码654321) 并赋予其weixx数据库的所有权限</span></span><br><span class="line">GRANT ALL PRIVILEGES ON weixx.* TO wxx@localhost IDENTIFIED BY "654321";</span><br><span class="line"><span class="meta">#</span><span class="bash"> 允许wxx用户可以从任意机器上登入mysql</span></span><br><span class="line">GRANT ALL PRIVILEGES ON weixx.* TO wxx@"%" IDENTIFIED BY "654321"; </span><br><span class="line"></span><br><span class="line">sudo gedit /etc/mysql/my.cnf</span><br><span class="line"><span class="meta">#</span><span class="bash"> 在最后添加如下配置，允许其他机器访问MySQL</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">skip-networking =&gt; <span class="comment"># skip-networking</span></span></span><br><span class="line"></span><br><span class="line">注释/etc/mysql/mysql.conf.d/mysqld.cnf中的bind-adress 127.0.0.1</span><br></pre></td></tr></table></figure>
-<ol>
-<li>mysql服务操作</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 启动</span></span><br><span class="line">service mysql start</span><br><span class="line"><span class="meta">#</span><span class="bash"> 停止</span></span><br><span class="line">service mysql stop</span><br><span class="line"><span class="meta">#</span><span class="bash"> 重新启动</span></span><br><span class="line">service mysql restart</span><br></pre></td></tr></table></figure>
-<ol>
-<li>权限更改</li>
-</ol>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 给予所有权限给任意ip地址</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 方法一</span></span><br><span class="line">grant all privileges on *.* to 'root'@'%' identified by 'root' with grant option;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 方法二</span></span><br><span class="line">use msyql;</span><br><span class="line">update user set host='%' where user='root'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 刷新权限</span></span><br><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
-<p>碰到的问题：</p>
-<ul>
-<li>连接失败：access denied for user ‘root‘@’localhost’</li>
-</ul>
-<p>解决：密码错误，有时候Linux上能登陆也会显示密码错误，换个账号登陆就可以了。</p>
-<h3 id="Python环境配置"><a href="#Python环境配置" class="headerlink" title="Python环境配置"></a>Python环境配置</h3><h2 id="Centos"><a href="#Centos" class="headerlink" title="Centos"></a>Centos</h2><h3 id="jdk环境配置-1"><a href="#jdk环境配置-1" class="headerlink" title="jdk环境配置"></a>jdk环境配置</h3><p><a href="http://os.51cto.com/art/201609/517037.htm" target="_blank" rel="noopener">http://os.51cto.com/art/201609/517037.htm</a></p>
-<ul>
-<li>查看yum库中都有哪些jdk版本(暂时只发现了openjdk)</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# yum search java|grep jdk</span><br></pre></td></tr></table></figure>
-<ul>
-<li>选择版本，进行安装</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 选择1.7版本进行安装 </span></span><br><span class="line">[root@localhost ~]# yum install java-1.7.0-openjdk </span><br><span class="line"><span class="meta">#</span><span class="bash"> 安装完之后，默认的安装目录是在: /usr/lib/jvm/java-1.7.0-openjdk-1.7.0.75.x86_64</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>设置环境变量（没配置就可以用）</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# vi /etc/profile</span><br></pre></td></tr></table></figure>
-<p>​    在profile文件中添加如下内容</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#set java environment </span></span><br><span class="line"><span class="attr">JAVA_HOME</span>=/usr/lib/jvm/java-<span class="number">1.7</span>.<span class="number">0</span>-openjdk-<span class="number">1.7</span>.<span class="number">0.75</span>.x<span class="number">86_64</span> </span><br><span class="line"><span class="attr">JRE_HOME</span>=<span class="variable">$JAVA_HOME</span>/jre </span><br><span class="line"><span class="attr">CLASS_PATH</span>=.:<span class="variable">$JAVA_HOME</span>/lib/dt.jar:<span class="variable">$JAVA_HOME</span>/lib/tools.jar:<span class="variable">$JRE_HOME</span>/lib </span><br><span class="line"><span class="attr">PATH</span>=<span class="variable">$PATH</span>:<span class="variable">$JAVA_HOME</span>/bin:<span class="variable">$JRE_HOME</span>/bin </span><br><span class="line">export JAVA_HOME JRE_HOME CLASS_PATH PATH</span><br></pre></td></tr></table></figure>
-<ul>
-<li>让修改生效</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost java]# source /etc/profile</span><br></pre></td></tr></table></figure>
-<p>存在问题：</p>
-<ul>
-<li>连接不上</li>
-</ul>
-<p>存在原因：</p>
-<ul>
-<li>网络连接不上，尝试用ping试一下。</li>
-<li>mysql没有设置权限，具体参考Ubuntu设置jdk环境。</li>
-<li>防火墙防护，这个按网上找不到文件夹。</li>
-<li>3306端口没有加入白名单(罪魁祸首)</li>
-</ul>
-<h3 id="Mysql配置-1"><a href="#Mysql配置-1" class="headerlink" title="Mysql配置"></a>Mysql配置</h3><p><a href="https://www.jianshu.com/p/7cccdaa2d177" target="_blank" rel="noopener">https://www.jianshu.com/p/7cccdaa2d177</a></p>
-<ul>
-<li>添加 MySQL YUM 源</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash">wget <span class="string">'https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm'</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash">sudo rpm -Uvh mysql57-community-release-el7-11.noarch.rpm</span></span><br><span class="line"><span class="meta">$</span><span class="bash">yum repolist all | grep mysql</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>安装最新版本(不推荐)</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash">sudo yum install mysql-community-server</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>安装5.6版本</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo dnf config-manager --<span class="built_in">disable</span> mysql57-community</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo dnf config-manager --<span class="built_in">enable</span> mysql56-community</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> yum repolist | grep mysql</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>启动</li>
-</ul>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash">sudo service mysqld start </span></span><br><span class="line"><span class="meta">$</span><span class="bash">sudo systemctl start mysqld <span class="comment">#CentOS 7</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash">sudo systemctl status mysqld</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>其他同Ubuntu配置</li>
-</ul>
-<h1 id="阿里云"><a href="#阿里云" class="headerlink" title="阿里云"></a>阿里云</h1><h2 id="Mysql问题"><a href="#Mysql问题" class="headerlink" title="Mysql问题"></a>Mysql问题</h2>
+        
+          <a class="article-more-a" href="/2018/10/25/Linux/#more">more >></a>
+        
       
 
       
@@ -1218,13 +607,24 @@ var _hmt = _hmt || [];
     <div class="article-info article-info-index">
       
       
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">学习笔记</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
       
 	<div class="article-category tagcloud">
 		<i class="icon-book icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="/categories/Exercise//" class="article-tag-list-link color4">Exercise</a>
+        			<a href="/categories/学习笔记//" class="article-tag-list-link color5">学习笔记</a>
         		</li>
       		
 		</ul>
@@ -1427,6 +827,22 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">博客配置</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Netty</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">学习笔记</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">Session</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
