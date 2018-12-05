@@ -15,7 +15,7 @@
 <meta property="og:site_name" content="HC的博客">
 <meta property="og:description" content="关于Session认证的探索关于Session认证的探索 在最近的项目中利用了Session进行用户的认证，乘机总结下踩过的坑以及解决方法 使用环境SpringBoot 2.x, Spring 4.x 碰到的问题 利用过滤器验证用户权限时，由于httpServletRequest中的输出输入流只能读取一次，导致在过滤器中取出前端发送的请求值，在将其与Sessionuser进行权限验证后，在业务逻辑">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-12-02T09:06:38.824Z">
+<meta property="og:updated_time" content="2018-12-05T07:29:06.805Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于Session认证的探索">
 <meta name="twitter:description" content="关于Session认证的探索关于Session认证的探索 在最近的项目中利用了Session进行用户的认证，乘机总结下踩过的坑以及解决方法 使用环境SpringBoot 2.x, Spring 4.x 碰到的问题 利用过滤器验证用户权限时，由于httpServletRequest中的输出输入流只能读取一次，导致在过滤器中取出前端发送的请求值，在将其与Sessionuser进行权限验证后，在业务逻辑">
@@ -193,6 +193,7 @@ var _hmt = _hmt || [];
 <li>利用过滤器验证用户权限时，由于<code>httpServletRequest</code>中的输出输入流只能读取一次，导致在过滤器中取出前端发送的请求值，在将其与Session<code>user</code>进行权限验证后，在业务逻辑层再次调用<code>httpServletRequest</code>流时抛出异常。</li>
 <li>由于WebSocket是基于TCP的一种独立实现，跟HTTP没什么关系。在WebSocket进行权限验证时无法拿到Tomcat内置的<code>session</code>。</li>
 </ul>
+<p>&lt;!-#-more–&gt;</p>
 <h2 id="探索路线"><a href="#探索路线" class="headerlink" title="探索路线"></a>探索路线</h2><h3 id="问题1"><a href="#问题1" class="headerlink" title="问题1"></a>问题1</h3><h4 id="只能读一次的原因"><a href="#只能读一次的原因" class="headerlink" title="只能读一次的原因"></a>只能读一次的原因</h4><p>首先要知道为什么<code>httpServletRequest</code>的流只能读取一次。</p>
 <p>调用<code>httpServletRequest.getInputStream()</code>可以看到获取的流类型为<code>ServletInputStream</code>，继承<code>InputStream</code>。</p>
 <p>下面复习下<code>InputStream</code>,<code>InputStream</code>的<code>read</code>方法内部有一个postion，标志当前流读取到的位置，每读取一次，位置就会移动一次，如果读到最后，<code>read()</code>会返回-1，标志已经读取完了。如果想要重新读取则需要重写<code>reset()</code>方法，当然能否reset是有条件的，它取决于<code>markSupported()</code>是否返回true。</p>
