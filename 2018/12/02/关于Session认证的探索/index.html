@@ -6,14 +6,14 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="attendent.github.io">
-  <title>关于Session认证的探索 | HC的博客</title>
+  <title>关于Session认证的探索 | 驿外残香 | HC的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="关于Session认证的探索关于Session认证的探索 在最近的项目中利用了Session进行用户的认证，乘机总结下踩过的坑以及解决方法 使用环境SpringBoot 2.x, Spring 4.x 碰到的问题 利用过滤器验证用户权限时，由于httpServletRequest中的输出输入流只能读取一次，导致在过滤器中取出前端发送的请求值，在将其与Sessionuser进行权限验证后，在业务逻辑">
 <meta name="keywords" content="Session">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于Session认证的探索">
 <meta property="og:url" content="attendent.github.io/2018/12/02/关于Session认证的探索/index.html">
-<meta property="og:site_name" content="HC的博客">
+<meta property="og:site_name" content="驿外残香 | HC的博客">
 <meta property="og:description" content="关于Session认证的探索关于Session认证的探索 在最近的项目中利用了Session进行用户的认证，乘机总结下踩过的坑以及解决方法 使用环境SpringBoot 2.x, Spring 4.x 碰到的问题 利用过滤器验证用户权限时，由于httpServletRequest中的输出输入流只能读取一次，导致在过滤器中取出前端发送的请求值，在将其与Sessionuser进行权限验证后，在业务逻辑">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:updated_time" content="2018-12-05T07:43:15.002Z">
@@ -21,7 +21,7 @@
 <meta name="twitter:title" content="关于Session认证的探索">
 <meta name="twitter:description" content="关于Session认证的探索关于Session认证的探索 在最近的项目中利用了Session进行用户的认证，乘机总结下踩过的坑以及解决方法 使用环境SpringBoot 2.x, Spring 4.x 碰到的问题 利用过滤器验证用户权限时，由于httpServletRequest中的输出输入流只能读取一次，导致在过滤器中取出前端发送的请求值，在将其与Sessionuser进行权限验证后，在业务逻辑">
   
-    <link rel="alternative" href="/atom.xml" title="HC的博客" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="驿外残香 | HC的博客" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -61,10 +61,10 @@ var _hmt = _hmt || [];
 			<img src="/assets/img/header.jpg" class="js-avatar">
 		</a>
 		<hgroup>
-		  <h1 class="header-author"><a href="/">HC、</a></h1>
+		  <h1 class="header-author"><a href="/">HuaChen</a></h1>
 		</hgroup>
 		
-		<p class="header-subtitle">share some acknowledge</p>
+		<p class="header-subtitle">尝试总结跟分享一些学习上的知识</p>
 		
 
 		<nav class="header-menu">
@@ -119,10 +119,10 @@ var _hmt = _hmt || [];
 				<img src="/assets/img/header.jpg" class="js-avatar">
 			</div>
 			<hgroup>
-			  <h1 class="header-author js-header-author">HC、</h1>
+			  <h1 class="header-author js-header-author">HuaChen</h1>
 			</hgroup>
 			
-			<p class="header-subtitle"><i class="icon icon-quo-left"></i>share some acknowledge<i class="icon icon-quo-right"></i></p>
+			<p class="header-subtitle"><i class="icon icon-quo-left"></i>尝试总结跟分享一些学习上的知识<i class="icon icon-quo-right"></i></p>
 			
 			
 			
@@ -407,7 +407,7 @@ var _hmt = _hmt || [];
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2018 HC、
+    		&copy; 2018 HuaChen
     	</div>
       	<div class="footer-right">
       		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
