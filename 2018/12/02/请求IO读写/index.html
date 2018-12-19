@@ -6,15 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="attendent.github.io">
-  <title>Tag: Session | 驿外残香 | HC的博客</title>
+  <title>请求IO只能读写一次的原因与解决方案 | 驿外残香 | HC的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="驿外残香 | HC的博客">
-<meta property="og:url" content="attendent.github.io/tags/Session/index.html">
+  <meta name="description" content="使用环境SpringBoot 2.x, Spring 4.x 碰到的问题 利用过滤器验证用户权限时，由于httpServletRequest中的输出输入流只能读取一次，导致在过滤器中取出前端发送的Json请求值后，在将其与Session中user进行权限验证后，在业务逻辑层再次调用httpServletRequest流时抛出重复读取异常。">
+<meta name="keywords" content="Web">
+<meta property="og:type" content="article">
+<meta property="og:title" content="请求IO只能读写一次的原因与解决方案">
+<meta property="og:url" content="attendent.github.io/2018/12/02/请求IO读写/index.html">
 <meta property="og:site_name" content="驿外残香 | HC的博客">
+<meta property="og:description" content="使用环境SpringBoot 2.x, Spring 4.x 碰到的问题 利用过滤器验证用户权限时，由于httpServletRequest中的输出输入流只能读取一次，导致在过滤器中取出前端发送的Json请求值后，在将其与Session中user进行权限验证后，在业务逻辑层再次调用httpServletRequest流时抛出重复读取异常。">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-12-19T06:00:30.512Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="驿外残香 | HC的博客">
+<meta name="twitter:title" content="请求IO只能读写一次的原因与解决方案">
+<meta name="twitter:description" content="使用环境SpringBoot 2.x, Spring 4.x 碰到的问题 利用过滤器验证用户权限时，由于httpServletRequest中的输出输入流只能读取一次，导致在过滤器中取出前端发送的Json请求值后，在将其与Session中user进行权限验证后，在业务逻辑层再次调用httpServletRequest流时抛出重复读取异常。">
   
     <link rel="alternative" href="/atom.xml" title="驿外残香 | HC的博客" type="application/atom+xml">
   
@@ -158,61 +163,205 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-请求IO读写" class="article article-type-post " itemscope="" itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/02/WebSocket中的Session认证/" class="archive-article-date">
-  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/02/WebSocket中的Session认证/">解决WebSocket中的Session认证问题</a>
+    <h1 class="article-title" itemprop="name">
+      请求IO只能读写一次的原因与解决方案
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2018/12/02/请求IO读写/" class="archive-article-date">
+  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
+</a>
+        
+		
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">阅读量<span id="busuanzi_value_site_pv"></span>次</span>
+	
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="使用环境"><a href="#使用环境" class="headerlink" title="使用环境"></a>使用环境</h2><p>SpringBoot 2.x, Spring 4.x</p>
+<h2 id="碰到的问题"><a href="#碰到的问题" class="headerlink" title="碰到的问题"></a>碰到的问题</h2><ul>
+<li>利用过滤器验证用户权限时，由于<code>httpServletRequest</code>中的输出输入流只能读取一次，导致在过滤器中取出前端发送的Json请求值后，在将其与Session中<code>user</code>进行权限验证后，在业务逻辑层再次调用<code>httpServletRequest</code>流时抛出重复读取异常。</li>
+</ul>
+<a id="more"></a>
+<h2 id="探索路线"><a href="#探索路线" class="headerlink" title="探索路线"></a>探索路线</h2><h3 id="只能读一次的原因"><a href="#只能读一次的原因" class="headerlink" title="只能读一次的原因"></a>只能读一次的原因</h3><p>首先要知道为什么<code>httpServletRequest</code>的流只能读取一次。</p>
+<p>调用<code>httpServletRequest.getInputStream()</code>可以看到获取的流类型为<code>ServletInputStream</code>，继承<code>InputStream</code>。</p>
+<p>下面复习下<code>InputStream</code>,<code>InputStream</code>的<code>read</code>方法内部有一个postion，标志当前流读取到的位置，每读取一次，位置就会移动一次，如果读到最后，<code>read()</code>会返回-1，标志已经读取完了。如果想要重新读取则需要重写<code>reset()</code>方法，当然能否reset是有条件的，它取决于<code>markSupported()</code>是否返回true。</p>
+<p>在<code>InputStream</code>源码中默认不实现<code>reset()</code>，并且<code>markSupported()</code>默认返回false：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">reset</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="comment">// 调用重新读取则抛出异常</span></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"mark/reset not supported"</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">markSupported</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 不支持重新读取</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而查看<code>ServletInputStream</code>源码可以发现，该类没有重写<code>mark()</code>,<code>reset()</code>以及<code>markSupported()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">ServletInputStream</span> <span class="keyword">extends</span> <span class="title">InputStream</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">ServletInputStream</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">readLine</span><span class="params">(<span class="keyword">byte</span>[] b, <span class="keyword">int</span> off, <span class="keyword">int</span> len)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (len &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> c;</span><br><span class="line">            <span class="keyword">while</span>((c = <span class="keyword">this</span>.read()) != -<span class="number">1</span>) &#123;</span><br><span class="line">                b[off++] = (<span class="keyword">byte</span>)c;</span><br><span class="line">                ++count;</span><br><span class="line">                <span class="keyword">if</span> (c == <span class="number">10</span> || count == len) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> count &gt; <span class="number">0</span> ? count : -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">isFinished</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">isReady</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">setReadListener</span><span class="params">(ReadListener var1)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="使用HttpServletRequestWrapper"><a href="#使用HttpServletRequestWrapper" class="headerlink" title="使用HttpServletRequestWrapper"></a>使用HttpServletRequestWrapper</h3><p>既然<code>ServletInputStream</code>不支持重新读写，那么为什么不把流读出来后用容器存储起来，后面就可以多次利用了。</p>
+<p>所幸Java提供了一个请求包装器 ：<code>HttpServletRequestWrapper</code>基于装饰者模式实现了<code>HttpServletRequest</code>介面，只需要继承该类并实现你想要重新定义的方法即可。利用这个类可以将请求中的流读取到该类中，因此在后面可以不断通过调用该包装器取得所需的数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 代码来自网络，侵删</span><br><span class="line"> */</span><br><span class="line">public class BodyReaderHttpServletRequestWrapper  extends HttpServletRequestWrapper &#123;</span><br><span class="line"></span><br><span class="line">    private final byte[] body;</span><br><span class="line"></span><br><span class="line">    BodyReaderHttpServletRequestWrapper(HttpServletRequest request) &#123;</span><br><span class="line">        super(request);</span><br><span class="line">        String sessionStream = getBodyString(request);</span><br><span class="line">        body = sessionStream.getBytes(Charset.forName(&quot;UTF-8&quot;));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 获取请求Body</span><br><span class="line">     *</span><br><span class="line">     * @param request 请求</span><br><span class="line">     * @return Body字符串</span><br><span class="line">     */</span><br><span class="line">    private String getBodyString(final ServletRequest request) &#123;</span><br><span class="line">        StringBuilder sb = new StringBuilder();</span><br><span class="line">        InputStream inputStream = null;</span><br><span class="line">        BufferedReader reader = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            inputStream = cloneInputStream(request.getInputStream());</span><br><span class="line">            reader = new BufferedReader(new InputStreamReader(inputStream, Charset.forName(&quot;UTF-8&quot;)));</span><br><span class="line">            String line = &quot;&quot;;</span><br><span class="line">            while ((line = reader.readLine()) != null) &#123;</span><br><span class="line">                sb.append(line);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        finally &#123;</span><br><span class="line">            if (inputStream != null) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    inputStream.close();</span><br><span class="line">                &#125;</span><br><span class="line">                catch (IOException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            if (reader != null) &#123;</span><br><span class="line">                try &#123;</span><br><span class="line">                    reader.close();</span><br><span class="line">                &#125;</span><br><span class="line">                catch (IOException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        return sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 复制输入流</span><br><span class="line">     * @param inputStream 请求输入流</span><br><span class="line">     * @return 复制出来的输入流</span><br><span class="line">     */</span><br><span class="line">    private InputStream cloneInputStream(ServletInputStream inputStream) &#123;</span><br><span class="line">        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();</span><br><span class="line">        byte[] buffer = new byte[1024];</span><br><span class="line">        int len;</span><br><span class="line">        try &#123;</span><br><span class="line">            while ((len = inputStream.read(buffer)) &gt; -1) &#123;</span><br><span class="line">                byteArrayOutputStream.write(buffer, 0, len);</span><br><span class="line">            &#125;</span><br><span class="line">            byteArrayOutputStream.flush();</span><br><span class="line">        &#125;</span><br><span class="line">        catch (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return new ByteArrayInputStream(byteArrayOutputStream.toByteArray());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public BufferedReader getReader() &#123;</span><br><span class="line">        return new BufferedReader(new InputStreamReader(getInputStream()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public ServletInputStream getInputStream() &#123;</span><br><span class="line"></span><br><span class="line">        final ByteArrayInputStream bais = new ByteArrayInputStream(body);</span><br><span class="line"></span><br><span class="line">        return new ServletInputStream() &#123;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public int read() &#123;</span><br><span class="line">                return bais.read();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public boolean isFinished() &#123;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public boolean isReady() &#123;</span><br><span class="line">                return false;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            @Override</span><br><span class="line">            public void setReadListener(ReadListener readListener) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>并且在读取请求流的过滤器中使用该包装器：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">    BodyReaderHttpServletRequestWrapper myRequestWrapper;</span><br><span class="line">    HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 封装请求参数</span></span><br><span class="line">    myRequestWrapper = <span class="keyword">new</span> BodyReaderHttpServletRequestWrapper(httpServletRequest);</span><br><span class="line">    <span class="comment">// 从请求包装器中取出json值</span></span><br><span class="line">    <span class="keyword">int</span> index = <span class="keyword">new</span> Gson().fromJson(servletRequest.getReader(), InteractionData.class).getIndex();</span><br><span class="line">    <span class="comment">// 从请求包装器拿出Session属性user</span></span><br><span class="line">    User user = (User) myRequestWrapper.getSession().getAttribute(<span class="string">"user"</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 将请求包装器传递下</span></span><br><span class="line">    filterChain.doFilter(myRequestWrapper, servletResponse);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这时候就可以在后面的代码中再次调用流了</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Session</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Web</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http:attendent.github.io/2018/12/02/请求IO读写/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2018/12/02/WebSocket中的Session认证/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          解决WebSocket中的Session认证问题
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2018/11/30/博客配置/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">yilia基础博客配置</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#使用环境"><span class="toc-number">1.</span> <span class="toc-text">使用环境</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#碰到的问题"><span class="toc-number">2.</span> <span class="toc-text">碰到的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#探索路线"><span class="toc-number">3.</span> <span class="toc-text">探索路线</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#只能读一次的原因"><span class="toc-number">3.1.</span> <span class="toc-text">只能读一次的原因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用HttpServletRequestWrapper"><span class="toc-number">3.2.</span> <span class="toc-text">使用HttpServletRequestWrapper</span></a></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
 
+  
+    <section id="comments">
+      <div id="disqus_thread"></div>
+        <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'huachen'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </section>
+  
+
+  
 
           </div>
         </div>
@@ -237,9 +386,9 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: true,
 		toc_hide_index: true,

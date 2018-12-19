@@ -6,15 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="attendent.github.io">
-  <title>Tag: Session | 驿外残香 | HC的博客</title>
+  <title>CSRF原理与规范 | 驿外残香 | HC的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="驿外残香 | HC的博客">
-<meta property="og:url" content="attendent.github.io/tags/Session/index.html">
+  <meta name="description" content="CSRFCSRF概念CSRF跨站点请求伪造(Cross—Site Request Forgery) 相当于：针对一个特定的正常网站，攻击者利用URL或者Javascript伪造了一个请求，当用户点击攻击者设置的陷阱时(例如未知的第三方链接)即会发送该伪造的请求。若此时用户刚好访问过该正常网站并且此时用户浏览器与服务器的Session尚未过期，浏览器的 cookie 之中含有该用户的认证信息。此时该">
+<meta name="keywords" content="安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSRF原理与规范">
+<meta property="og:url" content="attendent.github.io/2018/12/19/服务器安全/index.html">
 <meta property="og:site_name" content="驿外残香 | HC的博客">
+<meta property="og:description" content="CSRFCSRF概念CSRF跨站点请求伪造(Cross—Site Request Forgery) 相当于：针对一个特定的正常网站，攻击者利用URL或者Javascript伪造了一个请求，当用户点击攻击者设置的陷阱时(例如未知的第三方链接)即会发送该伪造的请求。若此时用户刚好访问过该正常网站并且此时用户浏览器与服务器的Session尚未过期，浏览器的 cookie 之中含有该用户的认证信息。此时该">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-12-19T05:53:35.440Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="驿外残香 | HC的博客">
+<meta name="twitter:title" content="CSRF原理与规范">
+<meta name="twitter:description" content="CSRFCSRF概念CSRF跨站点请求伪造(Cross—Site Request Forgery) 相当于：针对一个特定的正常网站，攻击者利用URL或者Javascript伪造了一个请求，当用户点击攻击者设置的陷阱时(例如未知的第三方链接)即会发送该伪造的请求。若此时用户刚好访问过该正常网站并且此时用户浏览器与服务器的Session尚未过期，浏览器的 cookie 之中含有该用户的认证信息。此时该">
   
     <link rel="alternative" href="/atom.xml" title="驿外残香 | HC的博客" type="application/atom+xml">
   
@@ -158,61 +163,227 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-服务器安全" class="article article-type-post " itemscope="" itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/02/WebSocket中的Session认证/" class="archive-article-date">
-  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/02/WebSocket中的Session认证/">解决WebSocket中的Session认证问题</a>
+    <h1 class="article-title" itemprop="name">
+      CSRF原理与规范
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2018/12/19/服务器安全/" class="archive-article-date">
+  	<time datetime="2018-12-19T05:53:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-19</time>
+</a>
+        
+		
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">阅读量<span id="busuanzi_value_site_pv"></span>次</span>
+	
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h1><h3 id="CSRF概念"><a href="#CSRF概念" class="headerlink" title="CSRF概念"></a>CSRF概念</h3><p>CSRF跨站点请求伪造(Cross—Site Request Forgery)</p>
+<p>相当于：针对一个特定的正常网站，攻击者利用URL或者Javascript伪造了一个请求，当用户点击攻击者设置的陷阱时(例如未知的第三方链接)即会发送该伪造的请求。若此时用户刚好访问过该正常网站并且此时用户浏览器与服务器的Session尚未过期，浏览器的 cookie 之中含有该用户的认证信息。此时该请求将会认证通过，服务器将会认为这是用户本人发出的合法请求，此时请求生效。CSRF攻击成功。</p>
+<p>即攻击者盗用了你的身份，以你的名义发送了恶意请求，而对于服务器来说该请求是合法请求。</p>
+<p>由此看来，CSRF<strong>攻击成功有两个必须的条件：</strong></p>
+<p>1.被伪造身份的目标曾在该浏览器上访问过CSRF站点，且cookies尚未过期。</p>
+<p>2.目标被引诱在该浏览器上访问了攻击者放置恶意代码的域名或网站。</p>
+<p><strong>受攻击的对象：</strong></p>
+<p>由于攻击者是借助目标的cookie来欺骗服务器，但是攻击者并不能够拿到cookie。另外，对于服务器返回的结果，由于浏览器同源策略的限制，攻击者也无法进行解析。</p>
+<p>因此攻击者所能做的只有给服务器发送请求，令其执行请求中的命令，起到改变服务器数据的作用。所以我们要保护的对象是那些可以直接产生数据改变的服务，而对于那些读取数据的服务则不需要进行CSRF的保护。</p>
+<h3 id="CSRF检测"><a href="#CSRF检测" class="headerlink" title="CSRF检测"></a>CSRF检测</h3><p>由于CSRF攻击是利用服务器没有对浏览器发来的请求进行检测，从而导致服务器接受并处理了被攻击者修改后的请求。</p>
+<p>因此如果抓取一个正常请求的数据包，<strong>修改其请求内容并且去掉Referer字段</strong>后重新提交能够生效，那么就说明服务器没有对修改后的请求进行检测，即说明其存在CSRF漏洞。</p>
+<p>现代的漏洞检测工具有：CSRFTester，CSRF Request Builder等。</p>
+<h3 id="CSRF防御"><a href="#CSRF防御" class="headerlink" title="CSRF防御"></a>CSRF防御</h3><h4 id="验证-HTTP-Referer-字段"><a href="#验证-HTTP-Referer-字段" class="headerlink" title="验证 HTTP Referer 字段"></a>验证 HTTP Referer 字段</h4><p><strong>原理：</strong></p>
+<p>在HTTP协议中，规定了利用<code>Referer</code>字段来记录HTTP请求的来源位置。</p>
+<p>在通常情况下，用户的<strong>安全受限访问操作</strong>来源于同一个网站，正常请求发起URL跟<code>REferer</code>字段URL应拥有相同的一级(或二级)域名。</p>
+<p>攻击者构建CSRF攻击只能在他自己的网站上进行构建。</p>
+<p>综上，当服务器接受到HTTP请求时，可使用拦截器拦截该请求。判断该请求的<code>Referer</code>字段值。若该值为本网站的一级(或二级)域名，则证明是用户合法操作。若该值指向其他网站，则有可能是攻击者的CSRF攻击，可以拒绝该请求。</p>
+<p><strong>缺点：</strong></p>
+<p><strong>安全性无保障：</strong>由于<code>Referer</code>值是由浏览器提供，每个浏览器的具体实现可能有差别，并且不能够绝对保证浏览器没有安全漏洞(像IE6 或 FF2，已经出现一些方法可以篡改HTTP请求的<code>Referer</code>值)。</p>
+<p><strong>涉及用户隐私，<code>Referer</code>可禁用：</strong>若REferer字段值被禁用，当用户发出正常请求操作时，可能被服务器认定为CSRF攻击。</p>
+<h4 id="在请求地址中添加token验证"><a href="#在请求地址中添加token验证" class="headerlink" title="在请求地址中添加token验证"></a>在请求地址中添加token验证</h4><p><strong>原理：</strong></p>
+<p>攻击者之所以能够使用CSRF，是因为攻击者可以完全伪造用户的请求。</p>
+<p>那么在请求中放入黑客所不能伪造的信息，并且该信息不存在于 cookie 之中，即可以放在网页的URL上</p>
+<p>可以在 HTTP 请求中以参数的形式加入一个随机产生的 token，并将该token存在浏览器与服务器相连的Session上。并在服务器端建立一个拦截器来拦截验证请求中的 token参数，如果请求中没有 token 或者 token 内容不正确，则认为可能是 CSRF 攻击而拒绝该请求。</p>
+<p><strong>缺点：</strong></p>
+<p><strong>多个请求添加token很麻烦</strong>：一个网站可以发送的请求有很多，要在所有的请求上都加上token参数很麻烦。</p>
+<p><strong>难以保证token安全：</strong></p>
+<p>虽然攻击者无法得到正常网站中用户的token值。但如果该网站支持用户发布自己的网站地址，这时候攻击者将自己网站的地址发布到正常网站中，而用户通过正常网站跳转到攻击者网站时，攻击者可以取到自己网站URL上被附加的token参数值，此时便可以发动CSRF攻击。</p>
+<p>为了避免这一点，系统可以在添加 token 的时候增加一个判断，如果这个链接是链到自己本站的，就在后面添加 token，如果是通向外网则不加。</p>
+<p>另外，即使这个 csrftoken 不以参数的形式附加在请求之中，黑客的网站也同样可以通过 Referer 来得到这个 token 值以发动 CSRF 攻击（由于Referer字段会记录请求的来源，而为了使用户能够得到正确的token，在之前的URL中是附带了该token的）。</p>
+<h4 id="在HTTP头中自定义属性并验证"><a href="#在HTTP头中自定义属性并验证" class="headerlink" title="在HTTP头中自定义属性并验证"></a>在HTTP头中自定义属性并验证</h4><p><strong>原理：</strong></p>
+<p>该方法与token验证的不同之处在于：这里并不是把 token 以参数的形式置于 HTTP 请求之中，而是把它放到 HTTP 头中自定义的属性里。通过 XMLHttpRequest 这个类，可以一次性给所有该类请求加上 csrftoken 这个 HTTP 头属性，并把 token 值放入其中。这样解决了上种方法在请求中加入 token 的不便，同时，通过 XMLHttpRequest 请求的地址不会被记录到浏览器的地址栏，也不用担心 token 会透过 Referer 泄露到其他网站中去。</p>
+<p><strong>缺点</strong>：</p>
+<p><strong>异步请求无法使用所有场景:</strong>XMLHttpRequest 请求通常用于 Ajax 方法中对于页面局部的异步刷新，并非所有的请求都适合用这个类来发起，而且通过该类请求得到的页面不能被浏览器所记录下，从而进行前进，后退，刷新，收藏等操作，给用户带来不便。</p>
+<p><strong>重构无CSRF防护的系统不方便</strong>对于没有进行 CSRF 防护的遗留系统来说，要采用这种方法来进行防护，要把所有请求都改为 XMLHttpRequest 请求。但对于前一个方法需要更改所有请求来说，还是比较合算的。</p>
+<h4 id="在Cookie中添加token"><a href="#在Cookie中添加token" class="headerlink" title="在Cookie中添加token"></a>在Cookie中添加token</h4><p>我们知道，攻击者无法获取目标用户的cookie并且无法查看cookie内容，因此我们可以在用户的cookie上添加上随机用以验证的token。该方法与上面的几个方法基本相同，不同之处是将token的存储地点由服务器端的Session转换到客户端的Cookie中。它与将CSRF-Token存储在Session中是一样的，仅仅是Token的一种储存形式。</p>
+<p><strong>缺点：</strong></p>
+<p>如果攻击者不单单使用CSRF攻击，而是先使用xss攻击劫持用户的cookie，这时候攻击者将直接实现CSRF攻击。</p>
+<h4 id="加验证码"><a href="#加验证码" class="headerlink" title="加验证码"></a>加验证码</h4><p>在一下系统的关键服务上使用验证码强制用户与应用进行交互后才能完成请求。</p>
+<p><strong>缺点：</strong></p>
+<p><strong>用户体验差：</strong>尽管该方法能够有效遏制CSRF攻击，但过多的验证码无疑会降低用户的体验。</p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>在网站无需适配一些能够被篡改<code>Referer</code>字段的浏览器时，使用HTTP Referer字段验证是一个不错的选择。只需要增添一个拦截器判断请求的来源即可，无需太多的额外操作。但若被用户禁用掉<code>Referer</code>字段，该方法反而有点搬石头砸自己脚的感觉。</p>
+<p>采用token验证应该是一个更加完善的选择，但也存在这许多问题：</p>
+<p>若是放在请求URL内，若该正常网站外联了其他恶意网站，很容易便能被攻击者取得token进行CSRF攻击。而且对于每个请求都要加入附加token的操作，给前端造成了不小的工作量。不过该方法倒是很适合用于不支持用户自定义外部链接的网站。</p>
+<p>在HHTP头自定义属性倒是能利用异步请求的XMLHttpRequest 来一次性给Ajax请求加上token，能够有效减少前端工作量，但是缺点也很明显：对于大部分非异步请求仍然是需要自己为其附加上token值。</p>
+<p>最后对于作为验证的token是可以存放在客户端的cookie或者是服务器端的Session的，根据CSRF的攻击而言，拿不到cookie的值也就相当于该token是安全的。</p>
+<p>但是以上防护的前提仍是要建立在系统上没有XSS漏洞的前提下。否则攻击者将很容易获取到token值或者是cookie内容，此时以上针对CSRF攻击的操作就显得多此一举了。</p>
+<h2 id="参考网站"><a href="#参考网站" class="headerlink" title="参考网站"></a>参考网站</h2><p><a href="https://blog.csdn.net/stpeace/article/details/53512283" target="_blank" rel="noopener">CSRF攻击与防御（写得非常好）</a></p>
+<p><a href="为什么CSRF Token写在COOKIE里面">为什么CSRF Token写在COOKIE里面</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Session</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">安全</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http:attendent.github.io/2018/12/19/服务器安全/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/2018/12/05/Rest架构风格/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">RESTful架构风格与规范</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#CSRF"><span class="toc-number">1.</span> <span class="toc-text">CSRF</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#CSRF概念"><span class="toc-number">1.0.1.</span> <span class="toc-text">CSRF概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CSRF检测"><span class="toc-number">1.0.2.</span> <span class="toc-text">CSRF检测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CSRF防御"><span class="toc-number">1.0.3.</span> <span class="toc-text">CSRF防御</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#验证-HTTP-Referer-字段"><span class="toc-number">1.0.3.1.</span> <span class="toc-text">验证 HTTP Referer 字段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在请求地址中添加token验证"><span class="toc-number">1.0.3.2.</span> <span class="toc-text">在请求地址中添加token验证</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在HTTP头中自定义属性并验证"><span class="toc-number">1.0.3.3.</span> <span class="toc-text">在HTTP头中自定义属性并验证</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在Cookie中添加token"><span class="toc-number">1.0.3.4.</span> <span class="toc-text">在Cookie中添加token</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#加验证码"><span class="toc-number">1.0.3.5.</span> <span class="toc-text">加验证码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#思考"><span class="toc-number">1.0.4.</span> <span class="toc-text">思考</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#参考网站"><span class="toc-number">1.1.</span> <span class="toc-text">参考网站</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
 
+  
+    <section id="comments">
+      <div id="disqus_thread"></div>
+        <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'huachen'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </section>
+  
+
+  
 
           </div>
         </div>
@@ -237,9 +408,9 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: true,
 		toc_hide_index: true,
