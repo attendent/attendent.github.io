@@ -6,15 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="attendent.github.io">
-  <title>Archives | 驿外残香 | HC的博客</title>
+  <title>树的八种遍历实现（递归与非递归） | 驿外残香 | HC的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="驿外残香 | HC的博客">
-<meta property="og:url" content="attendent.github.io/archives/index.html">
+  <meta name="description" content="一 前言由于使用C语言实现，没有事先封装好的栈以及队列，故利用数组模拟栈和队列 以下是输出函数 123456789/** * 访问输出函数 * @param e 输出值 * @return 是否操作成功 */Status visit(RcdType e) &amp;#123;    printf(&quot;%d &quot;, e.key);    return TRUE;&amp;#125;">
+<meta name="keywords" content="算法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="树的八种遍历实现（递归与非递归）">
+<meta property="og:url" content="attendent.github.io/2018/12/02/树的八种遍历(递归与非递归)/index.html">
 <meta property="og:site_name" content="驿外残香 | HC的博客">
+<meta property="og:description" content="一 前言由于使用C语言实现，没有事先封装好的栈以及队列，故利用数组模拟栈和队列 以下是输出函数 123456789/** * 访问输出函数 * @param e 输出值 * @return 是否操作成功 */Status visit(RcdType e) &amp;#123;    printf(&quot;%d &quot;, e.key);    return TRUE;&amp;#125;">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-01-10T17:49:17.237Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="驿外残香 | HC的博客">
+<meta name="twitter:title" content="树的八种遍历实现（递归与非递归）">
+<meta name="twitter:description" content="一 前言由于使用C语言实现，没有事先封装好的栈以及队列，故利用数组模拟栈和队列 以下是输出函数 123456789/** * 访问输出函数 * @param e 输出值 * @return 是否操作成功 */Status visit(RcdType e) &amp;#123;    printf(&quot;%d &quot;, e.key);    return TRUE;&amp;#125;">
   
     <link rel="alternative" href="/atom.xml" title="驿外残香 | HC的博客" type="application/atom+xml">
   
@@ -158,36 +163,49 @@ var _hmt = _hmt || [];
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-树的八种遍历(递归与非递归)" class="article article-type-post " itemscope="" itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/01/11/平衡二叉树的旋转操作/" class="archive-article-date">
-  	<time datetime="2019-01-10T17:42:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-01-11</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/01/11/平衡二叉树的旋转操作/">平衡二叉树的旋转操作</a>
+    <h1 class="article-title" itemprop="name">
+      树的八种遍历实现（递归与非递归）
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2018/12/02/树的八种遍历(递归与非递归)/" class="archive-article-date">
+  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
+</a>
+        
+		
+		<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <span id="busuanzi_container_site_pv">阅读量<span id="busuanzi_value_site_pv"></span>次</span>
+	
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="一-前言"><a href="#一-前言" class="headerlink" title="一 前言"></a>一 前言</h2><p>由于使用C语言实现，没有事先封装好的栈以及队列，故利用数组模拟栈和队列</p>
+<p>以下是输出函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 访问输出函数</span></span><br><span class="line"><span class="comment"> * @param e 输出值</span></span><br><span class="line"><span class="comment"> * @return 是否操作成功</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function">Status <span class="title">visit</span><span class="params">(RcdType e)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%d "</span>, e.key);</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="二-递归方法"><a href="#二-递归方法" class="headerlink" title="二 递归方法"></a>二 递归方法</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 递归先序排列</span></span><br><span class="line"><span class="comment"> * @param T AVL树根节点</span></span><br><span class="line"><span class="comment"> * @param visit 访问函数</span></span><br><span class="line"><span class="comment"> * @return 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Status PreOrderTraverse(BBSTree T, Status (*visit)(RcdType)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (T) &#123;</span><br><span class="line">        visit(T-&gt;data);</span><br><span class="line">        PreOrderTraverse(T-&gt;lchild, visit);</span><br><span class="line">        PreOrderTraverse(T-&gt;rchild, visit);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 递归中序排列</span></span><br><span class="line"><span class="comment"> * @param T AVL树根节点</span></span><br><span class="line"><span class="comment"> * @param visit 访问函数</span></span><br><span class="line"><span class="comment"> * @return 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Status InOrderTraverse(BBSTree T, Status (*visit)(RcdType)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (T) &#123;</span><br><span class="line">        InOrderTraverse(T-&gt;lchild, visit);</span><br><span class="line">        visit(T-&gt;data);</span><br><span class="line">        InOrderTraverse(T-&gt;rchild, visit);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 递归后序排列</span></span><br><span class="line"><span class="comment"> * @param T AVL树根节点</span></span><br><span class="line"><span class="comment"> * @param visit 访问函数</span></span><br><span class="line"><span class="comment"> * @return 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Status PostOrderTraverse(BBSTree T, Status (*visit)(RcdType)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (T) &#123;</span><br><span class="line">        PostOrderTraverse(T-&gt;lchild, visit);</span><br><span class="line">        PostOrderTraverse(T-&gt;rchild, visit);</span><br><span class="line">        visit(T-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 递归层序排列</span></span><br><span class="line"><span class="comment"> * @param T AVL树根节点</span></span><br><span class="line"><span class="comment"> * @param visit 访问函数</span></span><br><span class="line"><span class="comment"> * @return 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">Status LevelOrderTraverse(BBSTree T, Status (*visit)(RcdType)) &#123;</span><br><span class="line">    <span class="keyword">int</span> <span class="keyword">static</span> front = <span class="number">0</span>, rear = <span class="number">0</span>, i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">static</span> BBSTree s[<span class="number">100</span>];</span><br><span class="line">    <span class="keyword">if</span> (i == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 将树的根节点入队</span></span><br><span class="line">        s[front++] = T;</span><br><span class="line">        <span class="keyword">if</span> (T == <span class="literal">NULL</span>)</span><br><span class="line">            <span class="keyword">return</span> FALSE;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 左右结点入队</span></span><br><span class="line">    <span class="keyword">if</span> (T-&gt;lchild != <span class="literal">NULL</span>)</span><br><span class="line">        s[front++] = T-&gt;lchild;</span><br><span class="line">    <span class="keyword">if</span> (T-&gt;rchild != <span class="literal">NULL</span>)</span><br><span class="line">        s[front++] = T-&gt;rchild;</span><br><span class="line">    visit(s[rear]-&gt;data);</span><br><span class="line">    <span class="keyword">if</span> (rear + <span class="number">1</span> == front)</span><br><span class="line">        <span class="keyword">return</span> TRUE;</span><br><span class="line">    LevelOrderTraverse(s[++rear], visit);</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="三-非递归方法"><a href="#三-非递归方法" class="headerlink" title="三 非递归方法"></a>三 非递归方法</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 非递归先序排列</span></span><br><span class="line"><span class="comment"> * @param T AVL树根节点</span></span><br><span class="line"><span class="comment"> * @param visit 访问函数</span></span><br><span class="line"><span class="comment"> * @return 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">void PreOrderTraverse2(BBSTree T, Status (*visit)(RcdType)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!T)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="comment">// 模拟栈的操作</span></span><br><span class="line">    BBSTree s[MAX];</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    s[i++] = T;</span><br><span class="line">    <span class="comment">// 若栈不为空</span></span><br><span class="line">    <span class="keyword">while</span> (i != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 访问节点并将该节点右左节点入栈</span></span><br><span class="line">        BBSTree temp = s[--i];</span><br><span class="line">        visit(temp-&gt;data);</span><br><span class="line">        <span class="keyword">if</span> (temp-&gt;rchild)</span><br><span class="line">            s[i++] = temp-&gt;rchild;</span><br><span class="line">        <span class="keyword">if</span> (temp-&gt;lchild)</span><br><span class="line">            s[i++] = temp-&gt;lchild;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 非递归中序排列</span></span><br><span class="line"><span class="comment"> * @param T AVL树根节点</span></span><br><span class="line"><span class="comment"> * @param visit 访问函数</span></span><br><span class="line"><span class="comment"> * @return 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">void InOrderTraverse2(BBSTree T, Status (*visit)(RcdType)) &#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (!T)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="comment">// 使用数组模拟栈的操作</span></span><br><span class="line">    BBSTree s[MAX];</span><br><span class="line">    BBSTree curr = T-&gt;lchild;</span><br><span class="line">    s[i++] = T;</span><br><span class="line">    <span class="keyword">while</span> (curr != <span class="literal">NULL</span> || i != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">while</span> (curr != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">// 遍历所有的左子树并入栈</span></span><br><span class="line">            s[i++] = curr;</span><br><span class="line">            curr = curr-&gt;lchild;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 出栈</span></span><br><span class="line">        curr = s[--i];</span><br><span class="line">        <span class="comment">// 访问结点并指向右子树</span></span><br><span class="line">        visit(curr-&gt;data);</span><br><span class="line">        curr = curr-&gt;rchild;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 非递归后序排列</span></span><br><span class="line"><span class="comment"> * @param T AVL树根节点</span></span><br><span class="line"><span class="comment"> * @param visit 访问函数</span></span><br><span class="line"><span class="comment"> * @return 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">void PostOrderTraverse2(BBSTree T, Status (*visit)(RcdType)) &#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 使用数组模拟栈</span></span><br><span class="line">    BBSTree s[MAX];</span><br><span class="line">    BBSTree curr = T;</span><br><span class="line">    BBSTree pre = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="keyword">while</span> (curr != <span class="literal">NULL</span> || i != <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 将所有左节点入栈</span></span><br><span class="line">        <span class="keyword">while</span> (curr != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            s[i++] = curr;</span><br><span class="line">            curr = curr-&gt;lchild;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 出栈</span></span><br><span class="line">        curr = s[i - <span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (curr-&gt;rchild == <span class="literal">NULL</span> || curr-&gt;rchild == pre) &#123;</span><br><span class="line">            visit(curr-&gt;data);</span><br><span class="line">            pre = curr;</span><br><span class="line">            i--;</span><br><span class="line">            curr = <span class="literal">NULL</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            curr = curr-&gt;rchild;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 非递归层序排列</span></span><br><span class="line"><span class="comment"> * @param T AVL树根节点</span></span><br><span class="line"><span class="comment"> * @param visit 访问函数</span></span><br><span class="line"><span class="comment"> * @return 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">void LevelOrderTraverse2(BBSTree T, Status (*visit)(RcdType)) &#123;</span><br><span class="line">    <span class="comment">// 使用数组模拟队列</span></span><br><span class="line">    BBSTree s[<span class="number">100</span>];</span><br><span class="line">    <span class="keyword">if</span> (!T)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    <span class="keyword">int</span> front = <span class="number">0</span>, rear = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 将树的根节点入队</span></span><br><span class="line">    s[rear++] = T;</span><br><span class="line">    <span class="comment">// 当队列还有元素时</span></span><br><span class="line">    <span class="keyword">while</span> (front != rear) &#123;</span><br><span class="line">        <span class="comment">// 访问结点值</span></span><br><span class="line">        visit(s[front]-&gt;data);</span><br><span class="line">        <span class="comment">// 将结点的左右孩子入队</span></span><br><span class="line">        <span class="keyword">if</span> (s[front]-&gt;lchild != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            s[rear] = s[front]-&gt;lchild;</span><br><span class="line">            rear++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (s[front]-&gt;rchild != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            s[rear] = s[front]-&gt;rchild;</span><br><span class="line">            rear++;</span><br><span class="line">        &#125;</span><br><span class="line">        front++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -199,334 +217,144 @@ var _hmt = _hmt || [];
 		</ul>
 	</div>
 
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
       
-        </div></section>
+
       
+
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/19/XSS原理与防御手段/" class="archive-article-date">
-  	<time datetime="2018-12-19T05:53:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/19/XSS原理与防御手段/">XSS原理与防御手段</a>
-    </h1>
-  
+      </div>
+    </span>
+  </div>
+</div>
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">安全</a>
-        		</li>
-      		
-		</ul>
-	</div>
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+		<img src="http://qr.liantu.com/api.php?text=http:attendent.github.io/2018/12/02/树的八种遍历(递归与非递归)/" alt="微信分享二维码">
+    </div>
+</div>
 
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/19/CSRF原理与防御手段/" class="archive-article-date">
-  	<time datetime="2018-12-19T05:53:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-19</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2018/12/02/WebSocket中的Session认证/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          解决WebSocket中的Session认证问题
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/12/02/请求IO读写/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">请求IO只能读写一次的原因与解决方案</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/19/CSRF原理与防御手段/">CSRF原理与防御手段</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">安全</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一-前言"><span class="toc-number">1.</span> <span class="toc-text">一 前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二-递归方法"><span class="toc-number">2.</span> <span class="toc-text">二 递归方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三-非递归方法"><span class="toc-number">3.</span> <span class="toc-text">三 非递归方法</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/05/Rest架构风格/" class="archive-article-date">
-  	<time datetime="2018-12-05T05:17:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-05</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/05/Rest架构风格/">RESTful架构风格与规范</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">学习笔记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/02/WebSocket中的Session认证/" class="archive-article-date">
-  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/02/WebSocket中的Session认证/">解决WebSocket中的Session认证问题</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Session</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/02/树的八种遍历(递归与非递归)/" class="archive-article-date">
-  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/02/树的八种遍历(递归与非递归)/">树的八种遍历实现（递归与非递归）</a>
-    </h1>
+    <section id="comments">
+      <div id="disqus_thread"></div>
+        <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'huachen'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function() {
+          var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+          dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </section>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">算法</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/12/02/请求IO读写/" class="archive-article-date">
-  	<time datetime="2018-12-02T09:03:54.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-12-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/12/02/请求IO读写/">请求IO只能读写一次的原因与解决方案</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Web</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/11/30/博客配置/" class="archive-article-date">
-  	<time datetime="2018-11-30T12:54:22.150Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-30</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/11/30/博客配置/">yilia基础博客配置</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">博客配置</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2018/11/27/修复TCP连接/" class="archive-article-date">
-  	<time datetime="2018-11-27T00:55:29.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-11-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/11/27/修复TCP连接/">阿里云上修复TCP断开异常</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Netty</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-
 
           </div>
         </div>
@@ -551,8 +379,8 @@ var _hmt = _hmt || [];
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,
